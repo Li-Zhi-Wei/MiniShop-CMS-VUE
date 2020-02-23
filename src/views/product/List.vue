@@ -7,7 +7,7 @@
       <div class="header-right">
         <el-button type="primary">新 增</el-button>
         <el-input class="input" placeholder="搜索商品名" size="medium" v-model="input">
-          <el-button slot="append" icon="el-icon-search"></el-button>
+          <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
         </el-input>
       </div>
     </div>
@@ -44,7 +44,7 @@
           <template slot-scope="scope">
             <el-button plain size="mini" type="warning" @click="handleModifyStatus(scope.row.id)" v-if="scope.row.status" v-auth="'商品上架/下架'">下 架</el-button>
             <el-button plain size="mini" type="success" @click="handleModifyStatus(scope.row.id)" v-if="!scope.row.status" v-auth="'商品上架/下架'">上 架</el-button>
-            <el-button plain size="mini" type="primary" @click="handleEdit(scope.row)">编 辑</el-button>
+            <el-button plain size="mini" type="primary" @click="handleEdit(scope.row)" v-auth="'编辑商品'">编 辑</el-button>
             <el-button plain size="mini" type="danger" @click="handleDel(scope.row.id)" v-auth="'删除商品'">删 除</el-button>
           </template>
         </el-table-column>
@@ -74,6 +74,7 @@ export default {
       loading: true, // 显示加载状态
       total_nums: null,
       currentPage: 1,
+      input: null
     }
   },
   created() {
@@ -82,7 +83,13 @@ export default {
   methods: {
 
     async getProducts() {
-      const res = await product.getProductsPaginate(10, this.currentPage - 1)
+      this.loading = true
+      const params = {
+        count: 10,
+        page: this.currentPage - 1,
+        product_name: this.input
+      }
+      const res = await product.getProductsPaginate(params)
       this.productList = res.collection
       this.total_nums = res.total_nums
       this.loading = false
@@ -90,7 +97,10 @@ export default {
 
     // 翻页
     handleCurrentChange() {
-      this.loading = true
+      this.getProducts()
+    },
+
+    search() {
       this.getProducts()
     },
 

@@ -4,8 +4,9 @@ class Product {
   // 是否自行处理接口异常
   handleError = true
 
-  async getProductsPaginate(count, page) {
-    const res = await get(`v1/product/paginate?count=${count}&page=${page}`)
+  async getProductsPaginate(params) {
+    params.showBackend = this.handleError
+    const res = await get('v1/product/paginate', params)
     return res
   }
 

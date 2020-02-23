@@ -35,7 +35,7 @@
     </div>
     <el-dialog title="提示" :visible.sync="showDialog" width="30%" center>
       <span>确定删除id为{{id}}的轮播图？</span>
-      <span slot="footer" class="dialog-footer">
+      <span slot="footer">
         <el-button @click="showDialog = false">取 消</el-button>
         <el-button type="primary" @click="deleteBanner">确 定</el-button>
       </span>
@@ -76,6 +76,7 @@ export default {
 
     // 获取所有轮播图数据
     async getBanners() {
+      this.loading = true
       // 调用banner模型类下的方法，并将结果赋值给组件的数据对象实现数据绑定并响应渲染到页面上
       this.bannerList = await banner.getBanners()
       this.loading = false

@@ -42,7 +42,7 @@
           v-model="selectData"
           :data="allProducts">
       </el-transfer>
-      <span slot="footer" class="dialog-footer">
+      <span slot="footer">
         <el-button @click="showDialog = false">取 消</el-button>
         <el-button type="primary" @click="changeSelectData">确 定</el-button>
       </span>
@@ -52,14 +52,10 @@
 
 <script>
 import UploadImgs from '@/components/base/upload-imgs'
+import Utils from '@/lin/utils/util'
 import { customImageUpload } from '@/lin/utils/file'
 import theme from '@/models/theme'
 import product from '@/models/product'
-
-/** 生成随机字符串 */
-function createId() {
-  return Math.random().toString(36).substring(2)
-}
 
 export default {
   name: 'Form',
@@ -82,6 +78,7 @@ export default {
       showDialog: false, // 添加关联对话框
       selectData: [], // 穿梭框中已选关联商品
       allProducts: [], // 所有商品信息
+      uploadImage: customImageUpload,
       rules: {
         name: [
           {
@@ -115,12 +112,12 @@ export default {
         name: res.name,
         description: res.description,
         topic_img: [{
-          id: createId(),
+          id: Utils.getRandomStr(),
           imgId: res.topic_img.id,
           display: res.topic_img.url,
         }],
         head_img: [{
-          id: createId(),
+          id: Utils.getRandomStr(),
           imgId: res.head_img.id,
           display: res.head_img.url,
         }],
@@ -176,20 +173,6 @@ export default {
       // 因为数据要获取，所以组件加载时初始数据是空，调用表单的重置方法会重置为空
       this.temp = JSON.parse(JSON.stringify(this.initData))
       this.selectData = this.initData.products.map(item => item.id)
-    },
-    /**
-     * 自定义上传图片
-     */
-    async uploadImage(file) {
-      // 调用自定义图片上传的接口
-      const res = await customImageUpload(file)
-      for (let i = 0; i < res.length; i++) {
-        // 固定用法，返回一个promise
-        return Promise.resolve({
-          id: res[i].id,
-          url: res[i].url,
-        })
-      }
     },
   },
 }

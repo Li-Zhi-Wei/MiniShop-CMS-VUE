@@ -5,7 +5,7 @@
         <div class="lin-title">商品分类</div>
       </div>
       <div class="header-right">
-        <el-button type="primary" v-auth="'添加商品分类'">新 增</el-button>
+        <el-button type="primary" @click="handleAdd" v-auth="'新增商品分类'">新 增</el-button>
       </div>
     </div>
     <div class="table-container">
@@ -35,19 +35,23 @@
         <el-button type="primary" @click="deleteCategory">确 定</el-button>
       </span>
     </el-dialog>
-    <el-dialog :title="titel" :visible.sync="showDialogEdit">
+    <el-dialog :title="title" :visible.sync="showDialogEdit">
       <el-form ref="form" :rules="rules" :model="temp" status-icon label-width="auto" @submit.native.prevent>
         <el-form-item label="名称" prop="name">
-          <el-input size="medium" v-model="temp.name" placeholder="主题名称"/>
+          <el-input size="medium" v-model="temp.name" placeholder="分类名称"/>
         </el-form-item>
         <el-form-item label="简介" prop="description">
           <el-input size="medium" type="textarea" :rows="4" placeholder="可选，分类简介" v-model="temp.description"/>
         </el-form-item>
         <el-form-item label="图片" prop="img">
-          <upload-imgs ref="uploadEle_top" :max-num="1" :value="temp.img" :auto-upload="false"
+          <upload-imgs ref="uploadEle" :max-num="1" :value="temp.img" :auto-upload="false"
                        :remote-fuc="uploadImage"/>
         </el-form-item>
       </el-form>
+      <span slot="footer">
+        <el-button @click="resetForm">重 置</el-button>
+        <el-button type="primary" @click="handleSubmit">保 存</el-button>
+      </span>
     </el-dialog>
   </div>
 </template>
@@ -55,6 +59,8 @@
 <script>
 import category from '@/models/category'
 import UploadImgs from '@/components/base/upload-imgs'
+import { customImageUpload } from '@/lin/utils/file'
+import Utils from '@/lin/utils/util'
 
 export default {
   name: 'Category',
@@ -64,14 +70,32 @@ export default {
       categoryList: [],
       showDialogDelete: false,
       showDialogEdit: false,
+      uploadImage: customImageUpload,
       id: null,
       loading: true,
+      title: null,
       temp: {
         id: null,
         name: null,
         description: null,
         img: [],
-      }
+      },
+      rules: {
+        name: [
+          {
+            required: true,
+            message: '请输入分类名称',
+            trigger: 'blur',
+          },
+        ],
+        img: [
+          {
+            required: true,
+            message: '分类图片不能为空',
+            trigger: 'blur',
+          },
+        ],
+      },
     }
   },
   created() {
@@ -80,6 +104,7 @@ export default {
   methods: {
 
     async getCategorys() {
+      this.loading = true
       this.categoryList = await category.getCategorys()
       this.loading = false
     },
@@ -87,6 +112,50 @@ export default {
     handleDel(id) {
       this.id = id
       this.showDialogDelete = true
+    },
+
+    handleAdd() {
+      this.temp = {
+        id: null,
+        name: null,
+        description: null,
+        img: [],
+      }
+      this.title = '新增分类'
+      this.showDialogEdit = true
+    },
+
+    handleEdit(row) {
+      this.title = '编辑分类'
+      this.temp = {
+        id: row.id,
+        name: row.name,
+        description: row.description,
+        img: [{
+          id: Utils.getRandomStr(),
+          imgId: row.img.id,
+          display: row.img.url,
+        }]
+      }
+      this.showDialogEdit = true
+    },
+
+    async handleSubmit() {
+      this.temp.img = await this.$refs.uploadEle.getValue()
+      const data = {
+        name: this.temp.name,
+        description: this.temp.description,
+        topic_img_id: this.temp.img[0].imgId
+      }
+      let res
+      if (this.temp.id) {
+        res = await category.editCategory(this.temp.id, data)
+      } else {
+        res = await category.createCategory(data)
+      }
+      this.showDialogEdit = false
+      this.$message.success(res.msg)
+      this.getCategorys()
     },
 
     async deleteCategory() {
@@ -107,6 +176,10 @@ export default {
           type: 'error',
         })
       }
+    },
+
+    resetForm() {
+      this.$refs.form.resetFields()
     },
   },
 }

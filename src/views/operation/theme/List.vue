@@ -35,7 +35,7 @@
     </div>
     <el-dialog title="提示" :visible.sync="showDialog" width="30%" center>
       <span>确定删除id为{{id}}的主题？</span>
-      <span slot="footer" class="dialog-footer">
+      <span slot="footer">
         <el-button @click="showDialog = false">取 消</el-button>
         <el-button type="primary" @click="deleteTheme">确 定</el-button>
       </span>
@@ -72,6 +72,7 @@ export default {
   methods: {
     // 获取所有主题数据
     async getThemes() {
+      this.loading = true
       this.themeList = await theme.getThemes()
       this.loading = false
     },

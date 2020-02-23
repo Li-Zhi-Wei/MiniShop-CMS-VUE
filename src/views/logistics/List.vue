@@ -54,6 +54,7 @@ export default {
 
   methods: {
     async getLogistics() {
+      this.loading = true
       const params = {
         select: this.select,
         input: this.input,
@@ -74,12 +75,10 @@ export default {
     },
 
     handleCurrentChange() {
-      this.loading = true
       this.getLogistics()
     },
 
     search() {
-      this.loading = true
       this.getLogistics()
     },
   },

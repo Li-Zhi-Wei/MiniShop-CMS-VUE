@@ -55,11 +55,7 @@
 <script>
 import UploadImgs from '@/components/base/upload-imgs'
 import { customImageUpload } from '@/lin/utils/file'
-
-/** 生成随机字符串 */
-function createId() {
-  return Math.random().toString(36).substring(2)
-}
+import Utils from '@/lin/utils/util'
 
 export default {
   name: 'Form',
@@ -76,6 +72,7 @@ export default {
         items: [],
       },
       bannerItemImg: [],
+      uploadImage: customImageUpload,
       options: [
         {
           value: 0,
@@ -147,7 +144,7 @@ export default {
       for (let i = 0; i < this.temp.items.length; i++) {
         const item = this.temp.items[i]
         const img = [{
-          id: createId(),
+          id: Utils.getRandomStr(),
           imgId: item.img.id,
           display: item.img.url,
         }]
@@ -184,18 +181,30 @@ export default {
     async handleSubmit() {
       // 遍历banner下的items数组，把图片上传组件中的图片id赋值给每个item
       // 这一步不做的话，图片元素的表单检验不会通过
-      for (let i = 0; i < this.temp.items.length; i++) {
-        // 取出图片上传组件中的数据，因为索引与items是一致的，可以一一对应每个item
-        const img = await this.$refs.uploadEle[i].getValue()
-        // 图片上传组件中有图片
-        if (img.length > 0) {
-          // 把对应的图片id赋值给item
-          this.temp.items[i].img_id = img[0].imgId
-        } else {
-          // 图片上传组件中没有图片，新增的时候或者清空了原来已有的图片
-          this.temp.items[i].img_id = ''
-        }
-      }
+      const promises = this.$refs.uploadEle.map(item => item.getValue())
+      promises.forEach((promise, i) => {
+        promise.then(img => {
+          if (img.length > 0) {
+            // 把对应的图片id赋值给item
+            this.temp.items[i].img_id = img[0].imgId
+          } else {
+            // 图片上传组件中没有图片，新增的时候或者清空了原来已有的图片
+            this.temp.items[i].img_id = ''
+          }
+        })
+      })
+      // for (let i = 0; i < this.temp.items.length; i++) {
+      //   // 取出图片上传组件中的数据，因为索引与items是一致的，可以一一对应每个item
+      //   const img = await this.$refs.uploadEle[i].getValue()
+      //   // 图片上传组件中有图片
+      //   if (img.length > 0) {
+      //     // 把对应的图片id赋值给item
+      //     this.temp.items[i].img_id = img[0].imgId
+      //   } else {
+      //     // 图片上传组件中没有图片，新增的时候或者清空了原来已有的图片
+      //     this.temp.items[i].img_id = ''
+      //   }
+      // }
       // 获取表单验证的结果，都通过就触发一个名叫submit的自定义事件
       this.$refs.form.validate(valid => {
         if (valid) {
@@ -208,20 +217,6 @@ export default {
      */
     resetForm() {
       this.$refs.form.resetFields()
-    },
-    /**
-     * 自定义上传图片
-     */
-    async uploadImage(file) {
-      // 调用自定义图片上传的接口
-      const res = await customImageUpload(file)
-      for (let i = 0; i < res.length; i++) {
-        // 固定用法，返回一个promise
-        return Promise.resolve({
-          id: res[i].id,
-          url: res[i].url,
-        })
-      }
     },
   },
 }

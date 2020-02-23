@@ -38,13 +38,13 @@
         <el-table-column label="联系方式" prop="snap_address.mobile"></el-table-column>
         <el-table-column label="订单状态" prop="status">
           <template slot-scope="scope">
-            <el-tag type="danger" effect="dark" v-if="scope.row.status==1">未付款</el-tag>
-            <el-tag type="warning" effect="dark" v-if="scope.row.status==2">已付款</el-tag>
-            <el-tag type="success" v-if="scope.row.status==3">已发货</el-tag>
-            <el-tag type="danger"  v-if="scope.row.status==4">超&#12288;卖</el-tag>
-            <el-tag type="info" effect="dark" v-if="scope.row.status==5">已退款</el-tag>
-            <el-tag type="success" effect="dark" v-if="scope.row.status==6">已收货</el-tag>
-            <el-tag type="info" v-if="scope.row.status==7">已关闭</el-tag>
+            <el-tag type="danger" effect="dark" v-if="scope.row.status===1">未付款</el-tag>
+            <el-tag type="warning" effect="dark" v-if="scope.row.status===2">已付款</el-tag>
+            <el-tag type="success" v-if="scope.row.status===3">已发货</el-tag>
+            <el-tag type="danger"  v-if="scope.row.status===4">超&#12288;卖</el-tag>
+            <el-tag type="info" effect="dark" v-if="scope.row.status===5">已退款</el-tag>
+            <el-tag type="success" effect="dark" v-if="scope.row.status===6">已收货</el-tag>
+            <el-tag type="info" v-if="scope.row.status===7">已关闭</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="订单创建时间" prop="create_time"></el-table-column>
@@ -121,6 +121,7 @@ export default {
 
   methods: {
     async getOrder() {
+      this.loading = true
       const params = {
         start: this.date ? this.date[0] : null,
         end: this.date ? this.date[1] : null,
@@ -146,39 +147,16 @@ export default {
     },
 
     changeDate() {
-      this.loading = true
       this.getOrder()
     },
 
     handleCurrentChange() {
-      this.loading = true
       this.getOrder()
     },
 
     search() {
-      this.loading = true
       this.getOrder()
     },
-
-    // async deleteTheme() {
-    //   this.showDialog = false
-    //   this.loading = true
-    //   try {
-    //     const res = await theme.delThemeByIds([this.id])
-    //     this.getThemes()
-    //     this.loading = false
-    //     this.$message({
-    //       message: res.msg,
-    //       type: 'success',
-    //     })
-    //   } catch (e) {
-    //     this.loading = false
-    //     this.$message({
-    //       message: e.data.msg,
-    //       type: 'error',
-    //     })
-    //   }
-    // },
   },
 }
 </script>
