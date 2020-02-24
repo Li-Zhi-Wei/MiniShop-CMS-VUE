@@ -1,11 +1,11 @@
 <template>
-  <div class="lin-container">
+  <div class="lin-container" v-if="!switchComponent">
     <div class="header">
       <div class="header-left">
         <div class="lin-title">商品列表</div>
       </div>
       <div class="header-right">
-        <el-button type="primary">新 增</el-button>
+        <el-button type="primary" @click="handleAdd" v-auth="'新增商品'">新 增</el-button>
         <el-input class="input" placeholder="搜索商品名" size="medium" v-model="input">
           <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
         </el-input>
@@ -59,13 +59,17 @@
       </span>
     </el-dialog>
   </div>
+  <component v-else :is="targetComponent" :row="row" @back="handleBack"/>
 </template>
 
 <script>
 import product from '@/models/product'
+import Add from './Add'
+import Edit from './Edit'
 
 export default {
   name: 'List',
+  components: { Add, Edit },
   data() {
     return {
       productList: [],
@@ -74,7 +78,9 @@ export default {
       loading: true, // 显示加载状态
       total_nums: null,
       currentPage: 1,
-      input: null
+      input: null,
+      switchComponent: false, // 是否切换组件
+      targetComponent: '', // 切换的目标组件
     }
   },
   created() {
@@ -146,6 +152,30 @@ export default {
           type: 'error',
         })
       }
+    },
+
+    /**
+     * 新增按钮点击事件
+     */
+    handleAdd() {
+      this.switchComponent = true
+      this.targetComponent = 'Add'
+    },
+    /**
+     *  编辑按钮点击事件
+     */
+    handleEdit(row) {
+      this.switchComponent = true
+      this.targetComponent = 'Edit'
+      this.row = row
+    },
+    /**
+     * 处理子组件里点击返回的事件
+     */
+    handleBack() {
+      this.switchComponent = false
+      this.targetComponent = ''
+      this.getProducts()
     },
   },
 }

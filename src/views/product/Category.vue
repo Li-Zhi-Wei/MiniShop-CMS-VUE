@@ -141,6 +141,7 @@ export default {
     },
 
     async handleSubmit() {
+      this.showDialogEdit = false
       this.temp.img = await this.$refs.uploadEle.getValue()
       const data = {
         name: this.temp.name,

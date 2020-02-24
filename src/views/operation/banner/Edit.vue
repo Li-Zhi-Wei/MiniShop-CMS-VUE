@@ -25,7 +25,7 @@ export default {
   name: 'Edit',
   components: { Form },
   props: {
-    row: Object,
+    banner: Object,
   },
   data() {
     return {
@@ -34,7 +34,7 @@ export default {
   },
   created() {
     // 深拷贝
-    this.formData = JSON.parse(JSON.stringify(this.row))
+    this.formData = JSON.parse(JSON.stringify(this.banner))
   },
   methods: {
     // 表单组件的提交事件

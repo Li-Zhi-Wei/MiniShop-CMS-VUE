@@ -41,7 +41,7 @@
       </span>
     </el-dialog>
   </div>
-  <component v-else :is="targetComponent" :row="row" @back="handleBack"/>
+  <component v-else :is="targetComponent" :banner="row" @back="handleBack"/>
 </template>
 
 <script>

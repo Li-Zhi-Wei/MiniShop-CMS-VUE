@@ -19,7 +19,7 @@
       </el-form>
     </div>
     <div class="theme-product-box">
-      <div class="theme-product-box-title">关联商品</div>
+      <div class="theme-product-title">关联商品</div>
       <div class="theme-product-options">
         <el-button @click="handleAddProduct">编 辑</el-button>
       </div>
@@ -183,7 +183,7 @@ export default {
     >div{
       margin-top: 20px;
     }
-    .theme-product-box-title {
+    .theme-product-title {
       color: $parent-title-color;
     }
     .theme-product-options{
