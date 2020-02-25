@@ -186,8 +186,6 @@ export default {
     .theme-product-title {
       color: $parent-title-color;
     }
-    .theme-product-options{
-    }
   }
   .submit-box{
     margin-top: 20px;

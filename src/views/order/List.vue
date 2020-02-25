@@ -41,7 +41,7 @@
             <el-tag type="danger" effect="dark" v-if="scope.row.status===1">未付款</el-tag>
             <el-tag type="warning" effect="dark" v-if="scope.row.status===2">已付款</el-tag>
             <el-tag type="success" v-if="scope.row.status===3">已发货</el-tag>
-            <el-tag type="danger"  v-if="scope.row.status===4">超&#12288;卖</el-tag>
+            <el-tag type="danger"  v-if="scope.row.status===4">超&emsp;卖</el-tag>
             <el-tag type="info" effect="dark" v-if="scope.row.status===5">已退款</el-tag>
             <el-tag type="success" effect="dark" v-if="scope.row.status===6">已收货</el-tag>
             <el-tag type="info" v-if="scope.row.status===7">已关闭</el-tag>

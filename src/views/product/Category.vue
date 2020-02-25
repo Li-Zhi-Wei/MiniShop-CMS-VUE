@@ -149,6 +149,7 @@ export default {
         topic_img_id: this.temp.img[0].imgId
       }
       let res
+      // 如果有id则是编辑，没有id则是新增
       if (this.temp.id) {
         res = await category.editCategory(this.temp.id, data)
       } else {

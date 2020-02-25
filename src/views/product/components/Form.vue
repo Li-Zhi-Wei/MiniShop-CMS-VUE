@@ -6,16 +6,16 @@
           <el-input size="medium" v-model="temp.name" placeholder="商品名称"/>
         </el-form-item>
         <el-form-item label="简介" prop="summary">
-          <el-input size="medium" v-model="temp.summary" placeholder="商品简介" type="textarea" :autosize="{minRows:2}"/>
+          <el-input size="medium" v-model="temp.summary" placeholder="可选，商品简介" type="textarea" :autosize="{minRows:2}"/>
         </el-form-item>
         <el-form-item label="展示价格" prop="price">
-          <el-input size="medium" v-model="temp.price" placeholder="展示价格"/>
+          <el-input size="medium" v-model="temp.price" placeholder="展示价格，非真实购买价格"/>
         </el-form-item>
         <el-form-item label="划线价格" prop="show_price">
           <el-input size="medium" v-model="temp.show_price" placeholder="划线价格"/>
         </el-form-item>
         <el-form-item label="展示的销量" prop="sale">
-          <el-input size="medium" v-model="temp.sale" placeholder="划线价格"/>
+          <el-input size="medium" v-model="temp.sale" placeholder="展示的销量，会随着购买自动增加"/>
         </el-form-item>
         <el-form-item label="库存" prop="stock">
           <el-switch v-model="temp.stock" active-color="#00C292" active-text="有 货" inactive-text="无 货" :active-value="1" :inactive-value="0"></el-switch>
@@ -26,47 +26,63 @@
         <el-form-item label="包邮标签" prop="postage">
           <el-switch v-model="temp.postage" active-color="#00C292" active-text="显示包邮标签" inactive-text="不显示" :active-value="1" :inactive-value="0"></el-switch>
         </el-form-item>
-        <el-form-item label="所属分类" prop="category">
+        <el-form-item label="所属分类" prop="category_id">
           <el-select v-model="temp.category_id" clearable placeholder="请选择">
             <el-option v-for="item in categoryList" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="主图" prop="main_img">
-          <upload-imgs ref="uploadEle_main" :max-num="1" :value="temp.main_img" :auto-upload="false"
+          <upload-imgs ref="uploadEleMain" :max-num="1" :value="main_img" :auto-upload="false"
                        :remote-fuc="uploadImage"/>
         </el-form-item>
         <el-form-item label="详情图" prop="detail_img">
-          <upload-imgs ref="uploadEle_detail" :max-num="1" :value="temp.detail_img" :auto-upload="false"
+          <upload-imgs ref="uploadEleDetail" :value="detail_img" :auto-upload="false" sortable
                        :remote-fuc="uploadImage"/>
         </el-form-item>
       </el-form>
     </div>
-    <div class="sku-box">
-      <div class="sku-title">套 餐</div>
+    <div class="box">
+      <div class="title">套 餐</div>
       <div class="sku-options">
-        <el-button @click="handleAddProduct">编 辑</el-button>
+        <el-button @click="handleAddSku">新 增</el-button>
       </div>
       <div class="sku-table">
-        <el-table :data="temp.products">
-          <el-table-column label="图片" prop="img"></el-table-column>
+        <el-table :data="temp.sku">
+          <el-table-column label="图片">
+            <template slot-scope="scope">
+              <img class="img" :src="scope.row.img.url">
+            </template>
+          </el-table-column>
           <el-table-column label="名称" prop="name"></el-table-column>
           <el-table-column label="价格" prop="price"></el-table-column>
           <el-table-column label="库存" prop="stock"></el-table-column>
           <el-table-column label="销量" prop="name"></el-table-column>
           <el-table-column label="状态" prop="status"></el-table-column>
           <el-table-column label="运费" prop="postage"></el-table-column>
+          <el-table-column label="操作" fixed="right" width="170">
+            <template slot-scope="scope">
+              <el-button plain size="mini" type="primary" @click="handleEditSku(scope.row)">编 辑</el-button>
+              <el-button plain size="mini" type="danger" @click="handleDelSku(scope.row)">删 除</el-button>
+            </template>
+          </el-table-column>
         </el-table>
       </div>
     </div>
-    <div class="property-box">
-      <div class="property-title">规格参数</div>
+    <div class="box">
+      <div class="title">参 数</div>
       <div class="property-options">
-        <el-button @click="handleAddProduct">编 辑</el-button>
+        <el-button @click="handleAddProperty">新 增</el-button>
       </div>
-      <div class="sku-table">
-        <el-table :data="temp.products">
+      <div class="property-table">
+        <el-table :data="temp.property">
           <el-table-column label="名称" prop="name"></el-table-column>
           <el-table-column label="内容" prop="detail"></el-table-column>
+          <el-table-column label="操作" fixed="right" width="170">
+            <template slot-scope="scope">
+              <el-button plain size="mini" type="primary" @click="handleEditProperty(scope.row)">编 辑</el-button>
+              <el-button plain size="mini" type="danger" @click="handleDelProperty(scope.row)">删 除</el-button>
+            </template>
+          </el-table-column>
         </el-table>
       </div>
     </div>
@@ -74,19 +90,65 @@
       <el-button @click="resetForm">重 置</el-button>
       <el-button type="primary" @click="handleSubmit">保 存</el-button>
     </div>
-<!--    <el-dialog title="添加关联商品" :visible.sync="showDialog" width="50%">-->
-<!--      <el-transfer-->
-<!--          filterable-->
-<!--          filter-placeholder="输入商品名进行搜索"-->
-<!--          :titles="['商品库', '当前主题']"-->
-<!--          v-model="selectData"-->
-<!--          :data="allProducts">-->
-<!--      </el-transfer>-->
-<!--      <span slot="footer">-->
-<!--        <el-button @click="showDialog = false">取 消</el-button>-->
-<!--        <el-button type="primary" @click="changeSelectData">确 定</el-button>-->
-<!--      </span>-->
-<!--    </el-dialog>-->
+<!--    添加/编辑sku-->
+    <el-dialog :title="title" :visible.sync="showDialogSku">
+      <el-form ref="sku_form" :rules="skuRules" :model="skuTemp" status-icon label-width="80px" @submit.native.prevent>
+        <el-form-item label="名称" prop="name">
+          <el-input class="sku-input" size="medium" v-model="skuTemp.name" placeholder="名称"/>
+        </el-form-item>
+        <el-form-item label="价格" prop="price">
+          <el-input class="sku-input" size="medium" v-model="skuTemp.price" placeholder="价格"/>
+        </el-form-item>
+        <el-form-item label="库存" prop="stock">
+          <el-input class="sku-input" size="medium" v-model="skuTemp.stock" placeholder="库存数量"/>
+        </el-form-item>
+        <el-form-item label="运费" prop="postage">
+          <el-input class="sku-input" size="medium" v-model="skuTemp.postage" placeholder="运费"/>
+        </el-form-item>
+        <el-form-item label="状态" prop="status">
+          <el-switch v-model="skuTemp.status" active-color="#00C292" active-text="上 架" inactive-text="下 架" :active-value="1" :inactive-value="0"></el-switch>
+        </el-form-item>
+        <el-form-item label="图片" prop="img">
+          <upload-imgs ref="uploadEleSku" :max-num="1" :value="skuImg" :auto-upload="false"
+                       :remote-fuc="uploadImage"/>
+        </el-form-item>
+      </el-form>
+      <span slot="footer">
+        <el-button @click="showDialogSku = false">取 消</el-button>
+        <el-button type="primary" @click="handleSubmitSku">确 定</el-button>
+      </span>
+    </el-dialog>
+<!--    添加/编辑Property-->
+    <el-dialog :title="title" :visible.sync="showDialogProperty">
+      <el-form ref="property_form" :rules="propertyRules" :model="propertyTemp" status-icon label-width="80px" @submit.native.prevent>
+        <el-form-item label="名称" prop="name">
+          <el-input class="property-input" size="medium" v-model="propertyTemp.name" placeholder="名称"/>
+        </el-form-item>
+        <el-form-item label="内容" prop="detail">
+          <el-input class="property-input" size="medium" v-model="propertyTemp.detail" placeholder="内容" type="textarea" :autosize="{minRows:2}"/>
+        </el-form-item>
+      </el-form>
+      <span slot="footer">
+        <el-button @click="showDialogProperty = false">取 消</el-button>
+        <el-button type="primary" @click="handleSubmitProperty">确 定</el-button>
+      </span>
+    </el-dialog>
+<!--    删除sku的提示-->
+    <el-dialog title="提示" :visible.sync="showDialogDelSku" width="30%" center>
+      <span>确定删除&emsp;<span class="danger-span">{{delItem.name}}</span>&emsp;？</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="showDialogDelSku = false">取 消</el-button>
+        <el-button type="primary" @click="deleteSku">确 定</el-button>
+      </span>
+    </el-dialog>
+<!--    删除property的提示-->
+    <el-dialog title="提示" :visible.sync="showDialogDelProperty" width="30%" center>
+      <span>确定删除&emsp;<span class="danger-span">{{delItem.name}}</span>&emsp;？</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="showDialogDelProperty = false">取 消</el-button>
+        <el-button type="primary" @click="deleteProperty">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -104,48 +166,92 @@ export default {
   },
   data() {
     return {
-      temp: {
+      temp: { // 基础数据
         id: null,
         name: null,
         price: null,
-        stock: null,
+        stock: 1,
         category_id: null,
         main_img_url: null,
-        status: null,
+        status: 1,
         summary: null,
-        img_id: null,
-        postage: null,
+        postage: 0,
         sale: null,
         show_price: null,
         image: [],
         property: [],
         sku: [],
-        main_img: [], // 主图，用来更新 main_img_url, img_id
-        detail_img: [], // 详情图，用来更新image
       },
+      skuTemp: { // sku数据
+        id: null,
+        name: null,
+        price: null,
+        stock: null,
+        status: 1,
+        postage: null,
+        img: {},
+      },
+      propertyTemp: { // 属性数据
+        id: null,
+        name: null,
+        detail: null,
+      },
+      main_img: [], // 主图，用来更新 main_img_url, img_id
+      detail_img: [], // 详情图，用来更新image
+      skuImg: [], // sku图片，用来更新sku.img
       uploadImage: customImageUpload,
+      showDialogProperty: false,
+      showDialogSku: false,
       categoryList: null, // 分类列表
+      title: null, // 弹出框标题
+      delItem: {}, // 删除选项时选择的数据
+      showDialogDelSku: false,
+      showDialogDelProperty: false,
+      skuCopy: null, // sku副本，重置时用
+      propertyCopy: null, // property副本，重置时用
       rules: {
         name: [
-          {
-            required: true,
-            message: '请输入主题名称',
-            trigger: 'blur',
-          },
+          { required: true, message: '商品名称不能为空', trigger: 'blur' },
         ],
-        topic_img: [
-          {
-            required: true,
-            message: '主题图不能为空',
-            trigger: 'blur',
-          },
+        price: [
+          { required: true, message: '展示价格不能为空', trigger: 'blur' },
         ],
-        head_img: [
-          {
-            required: true,
-            message: '详情页头图不能为空',
-            trigger: 'blur',
-          },
+        show_price: [
+          { required: true, message: '划线价格不能为空', trigger: 'blur' },
+        ],
+        sale: [
+          { required: true, message: '销量不能为空', trigger: 'blur' },
+        ],
+        main_img: [
+          { required: true, message: '主图不能为空', trigger: 'blur' },
+        ],
+        detail_img: [
+          { required: true, message: '详情图不能为空', trigger: 'blur' }
+        ],
+      },
+      skuRules: {
+        name: [
+          { required: true, message: '名称不能为空', trigger: 'blur' },
+        ],
+        price: [
+          { required: true, message: '价格不能为空', trigger: 'blur' },
+        ],
+        stock: [
+          { required: true, message: '库存不能为空', trigger: 'blur' },
+        ],
+        postage: [
+          { required: true, message: '运费不能为空', trigger: 'blur' },
+        ],
+        img: [
+          { required: true, message: '图片不能为空', trigger: 'blur' },
+        ],
+      },
+      propertyRules: {
+        name: [
+          { required: true, message: '名称不能为空', trigger: 'blur' },
+        ],
+        detail: [
+          { required: true, message: '内容不能为空', trigger: 'blur' },
         ],
       },
     }
@@ -153,24 +259,146 @@ export default {
   async created() {
     this.temp = this.data || this.temp
     this.categoryList = await category.getCategorys()
+    if (this.data) {
+      this.main_img = [{
+        id: Utils.getRandomStr(),
+        imgId: this.data.img_id,
+        display: this.data.main_img_url,
+      }]
+      this.detail_img = this.data.image.map(item => ({
+        id: Utils.getRandomStr(),
+        imgId: item.id,
+        display: item.img.url,
+      }))
+      this.skuCopy = JSON.parse(JSON.stringify(this.temp.sku))
+      this.propertyCopy = JSON.parse(JSON.stringify(this.temp.property))
+    }
+  },
+  methods: {
+    handleAddSku() {
+      this.skuTemp = {
+        id: null,
+        name: null,
+        price: null,
+        stock: null,
+        status: 1,
+        postage: null,
+        img: [],
+      }
+      this.title = '新增套餐'
+      this.$refs.uploadEleSku.clear()
+      this.showDialogSku = true
+    },
+    handleEditSku(row) {
+      this.skuTemp = row
+      this.skuImg = [{
+        id: Utils.getRandomStr(),
+        imgId: row.img_id,
+        display: row.img.url,
+      }]
+      this.title = '编辑套餐'
+      this.showDialogSku = true
+    },
+    handleDelSku(row) {
+      this.delItem = row
+      this.showDialogDelSku = true
+    },
+    deleteSku() {
+      this.temp.sku.forEach((item, index) => {
+        if (item.id === this.delItem.id) {
+          this.temp.sku.splice(index, 1)
+        }
+      })
+      this.showDialogDelSku = false
+    },
+    async handleSubmitSku() {
+      const img = await this.$refs.uploadEleSku.getValue()
+      if (img.length > 0) {
+        this.skuTemp.img = {
+          id: img[0].imgId,
+          url: img[0].display,
+        }
+      }
+      this.$refs.sku_form.validate(valid => {
+        if (valid) {
+          this.temp.sku.push(this.skuTemp)
+          this.showDialogSku = false
+        }
+      })
+    },
+    handleAddProperty() {
+      this.propertyTemp = {
+        id: null,
+        name: null,
+        detail: null,
+      }
+      this.title = '新增参数'
+      this.showDialogProperty = true
+    },
+    handleEditProperty(row) {
+      this.propertyTemp = row
+      this.title = '编辑参数'
+      this.showDialogProperty = true
+    },
+    handleDelProperty(row) {
+      this.delItem = row
+      this.showDialogDelProperty = true
+    },
+    deleteProperty() {
+      this.temp.property.forEach((item, index) => {
+        if (item.id === this.delItem.id) {
+          this.temp.property.splice(index, 1)
+        }
+      })
+      this.showDialogDelProperty = false
+    },
+    handleSubmitProperty() {
+      this.$refs.property_form.validate(valid => {
+        if (valid) {
+          this.temp.property.push(this.propertyTemp)
+          this.showDialogProperty = false
+        }
+      })
+    },
+    async handleSubmit() {
+      this.temp.main_img = await this.$refs.uploadEleMain.getValue()
+      this.$refs.form.validate(valid => {
+        // TODO
+      })
+    },
+    resetForm() {
+      console.log(this.temp)
+      this.$refs.form.resetFields()
+      this.temp.sku = JSON.parse(JSON.stringify(this.skuCopy))
+      this.temp.property = JSON.parse(JSON.stringify(this.propertyCopy))
+      this.$refs.uploadEleMain.reset()
+      this.$refs.uploadEleDetail.reset()
+      console.log(this.temp)
+    }
   },
 }
 </script>
 
 <style lang="scss" scoped>
-  /*
-  .theme-product-box{
+  .box{
     >div{
       margin-top: 20px;
     }
-    .theme-product-box-title {
+    .title {
       color: $parent-title-color;
     }
-    .theme-product-options{
-    }
-  }*/
-  /*.submit-box{*/
-  /*  margin-top: 20px;*/
-  /*  margin-left: 280px;*/
-  /*}*/
+  }
+  .sku-input{
+    width: 400px;
+  }
+  .property-input{
+    width: 400px;
+  }
+  .submit-box{
+    margin-top: 20px;
+    margin-left: 280px;
+  }
+  .danger-span{
+    color: red;
+  }
 </style>

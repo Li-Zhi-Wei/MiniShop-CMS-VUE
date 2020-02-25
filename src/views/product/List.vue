@@ -26,8 +26,8 @@
         <el-table-column label="划线价" prop="show_price"></el-table-column>
         <el-table-column label="库存">
           <template slot-scope="scope">
-            <el-tag type="success" v-if="scope.row.stock">有&#12288;货</el-tag>
-            <el-tag type="info" v-if="!scope.row.stock">无&#12288;货</el-tag>
+            <el-tag type="success" v-if="scope.row.stock">有&emsp;货</el-tag>
+            <el-tag type="info" v-if="!scope.row.stock">无&emsp;货</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="状态" prop="status">
