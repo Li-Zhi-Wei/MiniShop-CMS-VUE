@@ -19,6 +19,7 @@
 
 <script>
 import Form from './components/Form'
+import product from '@/models/product'
 
 export default {
   name: 'Add',
@@ -28,24 +29,38 @@ export default {
     handleBack() {
       this.$emit('back')
     },
+    /**
+     * 提交
+     * @param formData
+     * @returns {Promise<void>}
+     */
     async handleSubmit(formData) {
-      // const data = {
-      //   id: formData.id,
-      //   name: formData.name,
-      //   description: formData.description,
-      //   topic_img_id: formData.topic_img[0].imgId,
-      //   head_img_id: formData.head_img[0].imgId,
-      //   products: formData.products.map(item => item.id),
-      // }
-      // try {
-      //   const res = await theme.createTheme(data)
-      //   await theme.addThemeProducts(res.result.id, data.products)
-      //   this.$message.success('添加成功')
-      //   this.handleBack()
-      // } catch (e) {
-      //   // 提示异常信息
-      //   this.$message.error(e.data.msg)
-      // }
+      const data = JSON.parse(JSON.stringify(formData))
+      data.image = formData.image.map((item, index) => ({
+        img_id: item.imgId,
+        order: index,
+      }))
+      data.property = formData.property.map(item => ({
+        name: item.name,
+        detail: item.detail,
+      }))
+      data.sku = formData.sku.map(item => ({
+        name: item.name,
+        postage: item.postage,
+        price: item.price,
+        status: item.status,
+        stock: item.stock,
+        img_id: item.img.id
+      }))
+      delete data.id
+      try {
+        const res = await product.createProduct(data)
+        this.$message.success(res.msg)
+        this.handleBack()
+      } catch (e) {
+        // 提示异常信息
+        this.$message.error(e.data.msg)
+      }
     },
   },
 }

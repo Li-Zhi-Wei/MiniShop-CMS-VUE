@@ -217,6 +217,7 @@ export default {
      */
     resetForm() {
       this.$refs.form.resetFields()
+      // this.$refs.uploadEle.forEach(item => item.reset())
     },
   },
 }

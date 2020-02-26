@@ -30,7 +30,7 @@
             <el-tag type="info" v-if="!scope.row.stock">无&emsp;货</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="状态" prop="status">
+        <el-table-column label="状态">
           <template slot-scope="scope">
             <el-tag type="success" v-if="scope.row.status">上架中</el-tag>
             <el-tag type="info" v-if="!scope.row.status">已下架</el-tag>
@@ -81,6 +81,7 @@ export default {
       input: null,
       switchComponent: false, // 是否切换组件
       targetComponent: '', // 切换的目标组件
+      row: null, // 点击的行数据
     }
   },
   created() {

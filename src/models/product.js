@@ -1,8 +1,10 @@
-import _axios, { get, _delete } from '@/lin/plugins/axios'
+import { get, _delete, patch, post } from '@/lin/plugins/axios'
 
 class Product {
   // 是否自行处理接口异常
   handleError = true
+
+  showBackend = true
 
   async getProductsPaginate(params) {
     params.showBackend = this.handleError
@@ -17,16 +19,17 @@ class Product {
   }
 
   async modifyStatus(id) {
-    const res = await _axios({
-      method: 'patch',
-      url: `v1/product/${id}`,
-      pamars: { handleError: this.handleError }
-    })
+    const res = await patch(`v1/product/${id}`, {}, { handleError: this.handleError })
     return res
   }
 
   async getAllProducts() {
     const res = await get('v1/product')
+    return res
+  }
+
+  async createProduct(data) {
+    const res = await post('v1/product', { ...data }, { showBackend: this.showBackend })
     return res
   }
 }

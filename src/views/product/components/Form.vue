@@ -27,16 +27,16 @@
           <el-switch v-model="temp.postage" active-color="#00C292" active-text="显示包邮标签" inactive-text="不显示" :active-value="1" :inactive-value="0"></el-switch>
         </el-form-item>
         <el-form-item label="所属分类" prop="category_id">
-          <el-select v-model="temp.category_id" clearable placeholder="请选择">
+          <el-select v-model="temp.category_id" clearable placeholder="可以为空">
             <el-option v-for="item in categoryList" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="主图" prop="main_img">
-          <upload-imgs ref="uploadEleMain" :max-num="1" :value="main_img" :auto-upload="false"
+        <el-form-item label="主图" prop="main_img_url">
+          <upload-imgs ref="uploadEleMain" :max-num="1" :value="mainImg" :auto-upload="false"
                        :remote-fuc="uploadImage"/>
         </el-form-item>
-        <el-form-item label="详情图" prop="detail_img">
-          <upload-imgs ref="uploadEleDetail" :value="detail_img" :auto-upload="false" sortable
+        <el-form-item label="详情图" prop="image">
+          <upload-imgs ref="uploadEleDetail" :value="detailImg" :auto-upload="false" sortable multiple
                        :remote-fuc="uploadImage"/>
         </el-form-item>
       </el-form>
@@ -57,7 +57,12 @@
           <el-table-column label="价格" prop="price"></el-table-column>
           <el-table-column label="库存" prop="stock"></el-table-column>
           <el-table-column label="销量" prop="name"></el-table-column>
-          <el-table-column label="状态" prop="status"></el-table-column>
+          <el-table-column label="状态">
+            <template slot-scope="scope">
+              <el-tag type="success" v-if="scope.row.status">上架中</el-tag>
+              <el-tag type="info" v-if="!scope.row.status">已下架</el-tag>
+            </template>
+          </el-table-column>
           <el-table-column label="运费" prop="postage"></el-table-column>
           <el-table-column label="操作" fixed="right" width="170">
             <template slot-scope="scope">
@@ -92,7 +97,7 @@
     </div>
 <!--    添加/编辑sku-->
     <el-dialog :title="title" :visible.sync="showDialogSku">
-      <el-form ref="sku_form" :rules="skuRules" :model="skuTemp" status-icon label-width="80px" @submit.native.prevent>
+      <el-form ref="skuForm" :rules="skuRules" :model="skuTemp" status-icon label-width="80px" @submit.native.prevent>
         <el-form-item label="名称" prop="name">
           <el-input class="sku-input" size="medium" v-model="skuTemp.name" placeholder="名称"/>
         </el-form-item>
@@ -120,7 +125,7 @@
     </el-dialog>
 <!--    添加/编辑Property-->
     <el-dialog :title="title" :visible.sync="showDialogProperty">
-      <el-form ref="property_form" :rules="propertyRules" :model="propertyTemp" status-icon label-width="80px" @submit.native.prevent>
+      <el-form ref="propertyForm" :rules="propertyRules" :model="propertyTemp" status-icon label-width="80px" @submit.native.prevent>
         <el-form-item label="名称" prop="name">
           <el-input class="property-input" size="medium" v-model="propertyTemp.name" placeholder="名称"/>
         </el-form-item>
@@ -173,6 +178,7 @@ export default {
         stock: 1,
         category_id: null,
         main_img_url: null,
+        img_id: null,
         status: 1,
         summary: null,
         postage: 0,
@@ -196,8 +202,8 @@ export default {
         name: null,
         detail: null,
       },
-      main_img: [], // 主图，用来更新 main_img_url, img_id
-      detail_img: [], // 详情图，用来更新image
+      mainImg: [], // 主图，用来更新 main_img_url, img_id
+      detailImg: [], // 详情图，用来更新image
       skuImg: [], // sku图片，用来更新sku.img
       uploadImage: customImageUpload,
       showDialogProperty: false,
@@ -222,10 +228,10 @@ export default {
         sale: [
           { required: true, message: '销量不能为空', trigger: 'blur' },
         ],
-        main_img: [
+        main_img_url: [
           { required: true, message: '主图不能为空', trigger: 'blur' },
         ],
-        detail_img: [
+        image: [
           { required: true, message: '详情图不能为空', trigger: 'blur' }
         ],
       },
@@ -260,12 +266,12 @@ export default {
     this.temp = this.data || this.temp
     this.categoryList = await category.getCategorys()
     if (this.data) {
-      this.main_img = [{
+      this.mainImg = [{
         id: Utils.getRandomStr(),
         imgId: this.data.img_id,
         display: this.data.main_img_url,
       }]
-      this.detail_img = this.data.image.map(item => ({
+      this.detailImg = this.data.image.map(item => ({
         id: Utils.getRandomStr(),
         imgId: item.id,
         display: item.img.url,
@@ -275,9 +281,12 @@ export default {
     }
   },
   methods: {
+    /**
+     * 新增sku
+     */
     handleAddSku() {
       this.skuTemp = {
-        id: null,
+        id: Utils.getRandomStr(),
         name: null,
         price: null,
         stock: null,
@@ -286,11 +295,17 @@ export default {
         img: [],
       }
       this.title = '新增套餐'
-      this.$refs.uploadEleSku.clear()
+      if (this.$refs.uploadEleSku) {
+        this.$refs.uploadEleSku.clear()
+      }
       this.showDialogSku = true
     },
+    /**
+     * 编辑sku
+     * @param row
+     */
     handleEditSku(row) {
-      this.skuTemp = row
+      this.skuTemp = JSON.parse(JSON.stringify(row))
       this.skuImg = [{
         id: Utils.getRandomStr(),
         imgId: row.img_id,
@@ -299,6 +314,10 @@ export default {
       this.title = '编辑套餐'
       this.showDialogSku = true
     },
+    /**
+     * 删除sku
+     * @param row
+     */
     handleDelSku(row) {
       this.delItem = row
       this.showDialogDelSku = true
@@ -311,6 +330,10 @@ export default {
       })
       this.showDialogDelSku = false
     },
+    /**
+     * 新增/编辑sku对话框提交
+     * @returns {Promise<void>}
+     */
     async handleSubmitSku() {
       const img = await this.$refs.uploadEleSku.getValue()
       if (img.length > 0) {
@@ -319,27 +342,49 @@ export default {
           url: img[0].display,
         }
       }
-      this.$refs.sku_form.validate(valid => {
+      this.skuTemp.price = parseFloat(this.skuTemp.price) || null
+      this.skuTemp.postage = parseFloat(this.skuTemp.postage) || null
+      this.skuTemp.stock = parseInt(this.skuTemp.stock, 10) || null
+      this.$refs.skuForm.validate(valid => {
         if (valid) {
-          this.temp.sku.push(this.skuTemp)
+          if (this.title === '编辑套餐') {
+            this.temp.sku.forEach((item, index) => {
+              if (item.id === this.skuTemp.id) {
+                this.temp.sku.splice(index, 1, JSON.parse(JSON.stringify(this.skuTemp)))
+              }
+            })
+          } else {
+            this.temp.sku.push(JSON.parse(JSON.stringify(this.skuTemp)))
+          }
           this.showDialogSku = false
         }
       })
     },
+    /**
+     * 新增参数
+     */
     handleAddProperty() {
       this.propertyTemp = {
-        id: null,
+        id: Utils.getRandomStr(),
         name: null,
         detail: null,
       }
       this.title = '新增参数'
       this.showDialogProperty = true
     },
+    /**
+     * 编辑参数
+     * @param row
+     */
     handleEditProperty(row) {
-      this.propertyTemp = row
+      this.propertyTemp = JSON.parse(JSON.stringify(row))
       this.title = '编辑参数'
       this.showDialogProperty = true
     },
+    /**
+     * 删除参数
+     * @param row
+     */
     handleDelProperty(row) {
       this.delItem = row
       this.showDialogDelProperty = true
@@ -352,20 +397,53 @@ export default {
       })
       this.showDialogDelProperty = false
     },
+    /**
+     * 新增/编辑参数对话框提交
+     */
     handleSubmitProperty() {
-      this.$refs.property_form.validate(valid => {
+      this.$refs.propertyForm.validate(valid => {
         if (valid) {
-          this.temp.property.push(this.propertyTemp)
+          if (this.title === '编辑参数') {
+            this.temp.property.forEach((item, index) => {
+              if (item.id === this.propertyTemp.id) {
+                this.temp.property.splice(index, 1, JSON.parse(JSON.stringify(this.propertyTemp)))
+              }
+            })
+          } else {
+            this.temp.property.push(JSON.parse(JSON.stringify(this.propertyTemp)))
+          }
           this.showDialogProperty = false
         }
       })
     },
+    /**
+     * 提交Form
+     * @returns {Promise<void>}
+     */
     async handleSubmit() {
-      this.temp.main_img = await this.$refs.uploadEleMain.getValue()
+      const mainImg = await this.$refs.uploadEleMain.getValue()
+      this.temp.image = await this.$refs.uploadEleDetail.getValue()
+      if (mainImg.length > 0) {
+        this.temp.main_img_url = mainImg[0].display
+        this.temp.img_id = mainImg[0].imgId
+      }
+      this.temp.price = parseFloat(this.temp.price) || null
+      this.temp.show_price = parseFloat(this.temp.show_price) || null
+      this.temp.sale = parseInt(this.temp.sale, 10) || null
+      if (this.temp.sku.length === 0) {
+        this.$message.error('最少添加1个套餐')
+        return
+      }
+      console.log(this.temp)
       this.$refs.form.validate(valid => {
-        // TODO
+        if (valid) {
+          this.$emit('submit', this.temp)
+        }
       })
     },
+    /**
+     * 重置Form
+     */
     resetForm() {
       console.log(this.temp)
       this.$refs.form.resetFields()

@@ -60,7 +60,7 @@ export default {
           // 调用模型的编辑轮播图信息方法
           await banner.editBanner(id, name, description)
         } catch (e) {
-          throw Object.values(e.data.msg).join('；')
+          throw Object.values(e.data.msg)
         }
       }
     },

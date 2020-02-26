@@ -41,6 +41,8 @@ export default {
     },
 
     async handleSubmit(formData) {
+      console.log('formData', formData)
+      this.handleBack()
     },
 
   },
