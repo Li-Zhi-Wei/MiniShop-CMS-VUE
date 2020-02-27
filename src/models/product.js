@@ -1,4 +1,4 @@
-import { get, _delete, patch, post } from '@/lin/plugins/axios'
+import { get, _delete, patch, post, put } from '@/lin/plugins/axios'
 
 class Product {
   // 是否自行处理接口异常
@@ -30,6 +30,11 @@ class Product {
 
   async createProduct(data) {
     const res = await post('v1/product', { ...data }, { showBackend: this.showBackend })
+    return res
+  }
+
+  async editProduct(data) {
+    const res = await put('v1/product', data, { showBackend: this.showBackend })
     return res
   }
 }

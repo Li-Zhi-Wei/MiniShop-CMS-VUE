@@ -130,17 +130,19 @@ export default {
   },
   created() {
     // 如果有传入props就覆盖temp，没有就保持原来的temp，对应新增和编辑的场景
-    this.temp = this.data || this.temp
+    this.temp = this.data ? JSON.parse(JSON.stringify(this.data)) : this.temp
     // 存在轮播图元素，初始化轮播图元素的图片组件
     if (this.temp.items.length > 0) {
       this.initBannerItemImage()
     }
+    console.log(this.data)
   },
   methods: {
     /**
      * 初始化图片上传组件
      */
     initBannerItemImage() {
+      this.bannerItemImg = []
       for (let i = 0; i < this.temp.items.length; i++) {
         const item = this.temp.items[i]
         const img = [{
@@ -216,7 +218,18 @@ export default {
      * 重置表单
      */
     resetForm() {
-      this.$refs.form.resetFields()
+      this.temp = this.data ? JSON.parse(JSON.stringify(this.data))
+        : {
+          id: null,
+          name: null,
+          description: null,
+          items: [],
+        }
+      if (this.temp.items.length > 0) {
+        this.initBannerItemImage()
+      }
+      console.log(this.temp)
+      // this.$refs.form.resetFields()
       // this.$refs.uploadEle.forEach(item => item.reset())
     },
   },

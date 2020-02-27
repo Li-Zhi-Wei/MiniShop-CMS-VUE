@@ -35,16 +35,15 @@ export default {
      * @returns {Promise<void>}
      */
     async handleSubmit(formData) {
-      const data = JSON.parse(JSON.stringify(formData))
-      data.image = formData.image.map((item, index) => ({
+      formData.image = formData.image.map((item, index) => ({
         img_id: item.imgId,
         order: index,
       }))
-      data.property = formData.property.map(item => ({
+      formData.property = formData.property.map(item => ({
         name: item.name,
         detail: item.detail,
       }))
-      data.sku = formData.sku.map(item => ({
+      formData.sku = formData.sku.map(item => ({
         name: item.name,
         postage: item.postage,
         price: item.price,
@@ -52,9 +51,9 @@ export default {
         stock: item.stock,
         img_id: item.img.id
       }))
-      delete data.id
+      delete formData.id
       try {
-        const res = await product.createProduct(data)
+        const res = await product.createProduct(formData)
         this.$message.success(res.msg)
         this.handleBack()
       } catch (e) {

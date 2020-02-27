@@ -213,8 +213,6 @@ export default {
       delItem: {}, // 删除选项时选择的数据
       showDialogDelSku: false,
       showDialogDelProperty: false,
-      skuCopy: null, // sku副本，重置时用
-      propertyCopy: null, // property副本，重置时用
       rules: {
         name: [
           { required: true, message: '商品名称不能为空', trigger: 'blur' },
@@ -263,7 +261,7 @@ export default {
     }
   },
   async created() {
-    this.temp = this.data || this.temp
+    this.temp = this.data ? JSON.parse(JSON.stringify(this.data)) : this.temp
     this.categoryList = await category.getCategorys()
     if (this.data) {
       this.mainImg = [{
@@ -272,12 +270,10 @@ export default {
         display: this.data.main_img_url,
       }]
       this.detailImg = this.data.image.map(item => ({
-        id: Utils.getRandomStr(),
-        imgId: item.id,
+        id: item.id, // 此处id为product_image表的主键
+        imgId: item.img_id,
         display: item.img.url,
       }))
-      this.skuCopy = JSON.parse(JSON.stringify(this.temp.sku))
-      this.propertyCopy = JSON.parse(JSON.stringify(this.temp.property))
     }
   },
   methods: {
@@ -434,10 +430,9 @@ export default {
         this.$message.error('最少添加1个套餐')
         return
       }
-      console.log(this.temp)
       this.$refs.form.validate(valid => {
         if (valid) {
-          this.$emit('submit', this.temp)
+          this.$emit('submit', JSON.parse(JSON.stringify(this.temp)))
         }
       })
     },
@@ -445,13 +440,11 @@ export default {
      * 重置Form
      */
     resetForm() {
-      console.log(this.temp)
       this.$refs.form.resetFields()
-      this.temp.sku = JSON.parse(JSON.stringify(this.skuCopy))
-      this.temp.property = JSON.parse(JSON.stringify(this.propertyCopy))
+      this.temp.sku = this.data ? JSON.parse(JSON.stringify(this.data.sku)) : []
+      this.temp.property = this.data ? JSON.parse(JSON.stringify(this.data.property)) : []
       this.$refs.uploadEleMain.reset()
       this.$refs.uploadEleDetail.reset()
-      console.log(this.temp)
     }
   },
 }
