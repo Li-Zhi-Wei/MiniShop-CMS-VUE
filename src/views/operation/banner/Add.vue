@@ -10,7 +10,7 @@
   <div class="form-container">
     <el-row>
       <el-col :lg="16" :md="20" :sm="24" :xs="24">
-        <Form @submit="handleSubmit"/>
+        <Form @submit="handleSubmit" :fullscreenLoading="fullscreenLoading"/>
       </el-col>
     </el-row>
   </div>
@@ -24,12 +24,18 @@ import banner from '@/models/banner'
 export default {
   name: 'Add',
   components: { Form },
+  data() {
+    return {
+      fullscreenLoading: false,
+    }
+  },
   methods: {
     // 返回按钮点击事件
     handleBack() {
       this.$emit('back')
     },
     async handleSubmit(formData) {
+      this.fullscreenLoading = true
       // 格式化数据
       formData.items = formData.items.map(item => ({
         img_id: item.img_id,
@@ -44,8 +50,12 @@ export default {
         // 触发一次返回按钮事件，回到列表列表页面
         this.handleBack()
       } catch (e) {
-        // 提示异常信息
-        this.$message.error(e.data.msg)
+        this.$notify.error({
+          message: e.data.msg,
+          title: '错误',
+          duration: 0,
+        })
+        this.fullscreenLoading = false
       }
     },
   },

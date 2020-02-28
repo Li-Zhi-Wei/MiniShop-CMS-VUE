@@ -4,6 +4,8 @@ class Banner {
   // 是否自行处理接口异常
   handleError = true
 
+  showBackend = true
+
   async getBanners() {
     const res = await get('v1/banner')
     return res
@@ -25,10 +27,7 @@ class Banner {
    * 编辑轮播图信息
    */
   async editBanner(id, name, description) {
-    const res = await patch(`v1/banner/${id}`, {
-      name,
-      description,
-    }, { handleError: this.handleError })
+    const res = await patch(`v1/banner/${id}`, { name, description }, { handleError: this.handleError })
     return res
   }
 

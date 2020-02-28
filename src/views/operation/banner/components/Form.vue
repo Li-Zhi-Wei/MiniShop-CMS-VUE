@@ -1,4 +1,5 @@
 <template>
+  <div v-loading.fullscreen.lock="fullscreenLoading">
   <el-form ref="form" :rules="rules" :model="temp" status-icon label-width="100px" @submit.native.prevent>
     <el-form-item label="名称" prop="name">
       <el-input size="medium" v-model="temp.name" placeholder="轮播图名称"/>
@@ -47,9 +48,18 @@
     <!--按钮-->
     <el-form-item>
       <el-button @click="resetForm">重 置</el-button>
-      <el-button type="primary" @click="handleSubmit">保 存</el-button>
+      <el-button type="primary" @click="showDialogSubmit = true">保 存</el-button>
     </el-form-item>
   </el-form>
+  <!--    提交的提示-->
+  <el-dialog title="提示" :visible.sync="showDialogSubmit" width="30%" center>
+    <span>确定提交？</span>
+    <span slot="footer" class="dialog-footer">
+        <el-button @click="showDialogSubmit = false">取 消</el-button>
+        <el-button type="primary" @click="handleSubmit">确 定</el-button>
+      </span>
+  </el-dialog>
+  </div>
 </template>
 
 <script>
@@ -62,6 +72,7 @@ export default {
   components: { UploadImgs },
   props: {
     data: Object,
+    fullscreenLoading: Boolean,
   },
   data() {
     return {
@@ -72,6 +83,7 @@ export default {
         items: [],
       },
       bannerItemImg: [],
+      showDialogSubmit: false,
       uploadImage: customImageUpload,
       options: [
         {
@@ -134,8 +146,9 @@ export default {
     // 存在轮播图元素，初始化轮播图元素的图片组件
     if (this.temp.items.length > 0) {
       this.initBannerItemImage()
+    } else {
+      this.handlePlusItem()
     }
-    console.log(this.data)
   },
   methods: {
     /**
@@ -195,23 +208,13 @@ export default {
           }
         })
       })
-      // for (let i = 0; i < this.temp.items.length; i++) {
-      //   // 取出图片上传组件中的数据，因为索引与items是一致的，可以一一对应每个item
-      //   const img = await this.$refs.uploadEle[i].getValue()
-      //   // 图片上传组件中有图片
-      //   if (img.length > 0) {
-      //     // 把对应的图片id赋值给item
-      //     this.temp.items[i].img_id = img[0].imgId
-      //   } else {
-      //     // 图片上传组件中没有图片，新增的时候或者清空了原来已有的图片
-      //     this.temp.items[i].img_id = ''
-      //   }
-      // }
-      // 获取表单验证的结果，都通过就触发一个名叫submit的自定义事件
-      this.$refs.form.validate(valid => {
-        if (valid) {
-          this.$emit('submit', this.temp)
-        }
+      Promise.all(promises).then(() => {
+        this.$refs.form.validate(valid => {
+          this.showDialogSubmit = false
+          if (valid) {
+            this.$emit('submit', this.temp)
+          }
+        })
       })
     },
     /**
@@ -228,9 +231,6 @@ export default {
       if (this.temp.items.length > 0) {
         this.initBannerItemImage()
       }
-      console.log(this.temp)
-      // this.$refs.form.resetFields()
-      // this.$refs.uploadEle.forEach(item => item.reset())
     },
   },
 }

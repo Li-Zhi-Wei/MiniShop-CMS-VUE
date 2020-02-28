@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container" v-loading.fullscreen.lock="fullscreenLoading">
     <div class="theme-box">
       <el-form ref="form" :rules="rules" :model="temp" status-icon label-width="100px" @submit.native.prevent>
         <el-form-item label="名称" prop="name">
@@ -32,7 +32,7 @@
     </div>
     <div class="submit-box">
       <el-button @click="resetForm">重 置</el-button>
-      <el-button type="primary" @click="handleSubmit">保 存</el-button>
+      <el-button type="primary" @click="showDialogSubmit = true">保 存</el-button>
     </div>
     <el-dialog title="添加关联商品" :visible.sync="showDialog" width="50%">
       <el-transfer
@@ -45,6 +45,14 @@
       <span slot="footer">
         <el-button @click="showDialog = false">取 消</el-button>
         <el-button type="primary" @click="changeSelectData">确 定</el-button>
+      </span>
+    </el-dialog>
+    <!--提交的提示-->
+    <el-dialog title="提示" :visible.sync="showDialogSubmit" width="30%" center>
+      <span>确定提交？</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="showDialogSubmit = false">取 消</el-button>
+        <el-button type="primary" @click="handleSubmit">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -62,6 +70,7 @@ export default {
   components: { UploadImgs },
   props: {
     data: Object,
+    fullscreenLoading: Boolean,
   },
   data() {
     return {
@@ -75,6 +84,7 @@ export default {
       },
       initData: null, // 初始数据的深拷贝
       themeProductList: [], // 主题内关联商品
+      showDialogSubmit: false,
       showDialog: false, // 添加关联对话框
       selectData: [], // 穿梭框中已选关联商品
       allProducts: [], // 所有商品信息
@@ -158,6 +168,7 @@ export default {
      * 提交表单
      */
     async handleSubmit() {
+      this.showDialogSubmit = false
       this.temp.topic_img = await this.$refs.uploadEle_top.getValue()
       this.temp.head_img = await this.$refs.uploadEle_head.getValue()
       this.$refs.form.validate(valid => {

@@ -10,7 +10,7 @@
     <div class="form-container">
       <el-row>
         <el-col :lg="16" :md="20" :sm="24" :xs="24">
-          <Form :data="formData" @submit="handleSubmit"/>
+          <Form :data="formData" :fullscreenLoading="fullscreenLoading" @submit="handleSubmit"/>
         </el-col>
       </el-row>
     </div>
@@ -30,14 +30,21 @@ export default {
   data() {
     return {
       formData: null,
+      fullscreenLoading: false,
     }
   },
   async created() {
     // 深拷贝
     this.formData = JSON.parse(JSON.stringify(this.row))
+    // 数据类型转换，避免后面校验时出现数据类型不一致的错误
     this.formData.price = parseFloat(this.formData.price) || null
     this.formData.show_price = parseFloat(this.formData.show_price) || null
     this.formData.sale = parseInt(this.formData.sale, 10) || null
+    this.formData.sku.forEach(item => {
+      item.price = parseFloat(item.price) || null
+      item.postage = parseFloat(item.postage) || null
+      item.stock = parseInt(item.stock, 10) || null
+    })
   },
   methods: {
     handleBack() {
@@ -45,43 +52,32 @@ export default {
     },
 
     async handleSubmit(formData) {
-      console.log('fffff', formData)
-      // formData.image = formData.image.map((item, index) => ({
-      //   img_id: item.imgId,
-      //   order: index,
-      // }))
-      // formData.property = formData.property.map(item => ({
-      //   name: item.name,
-      //   detail: item.detail,
-      // }))
-      // formData.sku = formData.sku.map(item => ({
-      //   name: item.name,
-      //   postage: item.postage,
-      //   price: item.price,
-      //   status: item.status,
-      //   stock: item.stock,
-      //   img_id: item.img.id
-      // }))
-      console.log('this.formData', this.formData)
-      // 基础信息处理
-      // await this.updateProductInfo(formData)
-      // 详情图处理
-      await this.updateImage(formData.image, formData.id)
-      // sku处理
-      // await this.updateSku(formData.sku)
-      // property处理
-      // await this.updateProperty(formData.property)
-      // console.log('formData', formData)
-      // try {
-      //   const res = await product.createProduct(formData)
-      //   this.$message.success(res.msg)
-      //   this.handleBack()
-      // } catch (e) {
-      //   // 提示异常信息
-      //   this.$message.error(e.data.msg)
-      // }
+      this.fullscreenLoading = true
+      try {
+        // 基础信息处理
+        await this.updateProductInfo(formData)
+        // 详情图处理
+        await this.updateImage(formData.image, formData.id)
+        // sku处理
+        await this.updateSku(formData.sku, formData.id)
+        // property处理
+        await this.updateProperty(formData.property, formData.id)
+        this.$message.success('编辑成功')
+        this.handleBack()
+      } catch (e) {
+        this.$notify.error({
+          message: e.data.msg,
+          title: '错误',
+          duration: 0,
+        })
+        this.fullscreenLoading = false
+      }
     },
-
+    /**
+     * 更新基础信息
+     * @param formData
+     * @returns {Promise<void>}
+     */
     async updateProductInfo(formData) {
       if (this.formData.category_id !== formData.category_id
         || this.formData.img_id !== formData.img_id
@@ -111,7 +107,12 @@ export default {
         await product.editProduct(data)
       }
     },
-
+    /**
+     * 更新详情图
+     * @param image
+     * @param id
+     * @returns {Promise<void>}
+     */
     async updateImage(image, id) {
       let addImage = []
       const delImage = []
@@ -160,8 +161,117 @@ export default {
       console.log('addImage', addImage)
       console.log('delImage', delImage)
       console.log('editImage', editImage)
-    }
-
+      if (addImage.length > 0) {
+        await product.addImage(addImage)
+      }
+      if (delImage.length > 0) {
+        await product.delImage(delImage)
+      }
+      if (editImage.length > 0) {
+        await product.editImage(editImage)
+      }
+    },
+    /**
+     * 更新Sku
+     * @param sku
+     * @param id
+     * @returns {Promise<void>}
+     */
+    async updateSku(sku, id) {
+      let addSku = []
+      const delSku = []
+      let editSku = []
+      const oriSku = this.formData.sku
+      // 找到新增的sku
+      addSku = sku.filter(item => item.id === null).map(item => ({
+        name: item.name,
+        price: item.price,
+        postage: item.postage,
+        status: item.status,
+        stock: item.stock,
+        product_id: id,
+        img_id: item.img.id
+      }))
+      // 找到删除的sku
+      oriSku.forEach(item => {
+        if (!sku.find(i => i.id === item.id)) {
+          delSku.push(item.id)
+        }
+      })
+      // 找到编辑的sku
+      editSku = sku.filter(item => {
+        const oriItem = oriSku.find(i => i.id === item.id)
+        if (typeof (oriItem) !== 'undefined') {
+          return item.img.id !== oriItem.img_id || item.name !== oriItem.name || item.postage !== oriItem.postage
+            || item.price !== oriItem.price || item.status !== oriItem.status || item.stock !== oriItem.stock
+        }
+        return false
+      }).map(item => ({
+        id: item.id,
+        name: item.name,
+        img_id: item.img.id,
+        postage: item.postage,
+        price: item.price,
+        status: item.status,
+        stock: item.stock,
+      }))
+      console.log('addSku', addSku)
+      console.log('editSku', editSku)
+      console.log('delSku', delSku)
+      if (addSku.length > 0) {
+        await product.addSku(addSku)
+      }
+      if (editSku.length > 0) {
+        await product.editSku(editSku)
+      }
+      if (delSku.length > 0) {
+        await product.delSku(delSku)
+      }
+    },
+    /**
+     * 更新Property
+     * @param property
+     * @param id
+     * @returns {Promise<void>}
+     */
+    async updateProperty(property, id) {
+      let addProperty = []
+      const delProperty = []
+      let editProperty = []
+      const oriProperty = this.formData.property
+      // 找到新增的property
+      addProperty = property.filter(item => item.id === null).map(item => ({
+        name: item.name,
+        detail: item.detail,
+        product_id: id
+      }))
+      // 找到删除的property
+      oriProperty.forEach(item => {
+        if (!property.find(i => i.id === item.id)) {
+          delProperty.push(item.id)
+        }
+      })
+      // 找到编辑的property
+      editProperty = property.filter(item => {
+        const oriItem = oriProperty.find(i => i.id === item.id)
+        if (typeof (oriItem) !== 'undefined') {
+          return item.name !== oriItem.name || item.detail !== oriItem.detail
+        }
+        return false
+      })
+      console.log('addProperty', addProperty)
+      console.log('delProperty', delProperty)
+      console.log('editProperty', editProperty)
+      if (addProperty.length > 0) {
+        await product.addProperty(addProperty)
+      }
+      if (editProperty.length > 0) {
+        await product.editProperty(editProperty)
+      }
+      if (delProperty.length > 0) {
+        await product.delProperty(delProperty)
+      }
+    },
   },
 }
 </script>

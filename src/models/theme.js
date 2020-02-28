@@ -4,13 +4,15 @@ class Theme {
   // 是否自行处理接口异常
   handleError = true
 
+  showBackend = true
+
   async getThemes() {
     const res = await get('v1/theme')
     return res
   }
 
   async delThemeByIds(ids) {
-    const res = await _delete('v1/theme', { ids }, { handleError: this.handleError })
+    const res = await _delete('v1/theme', { ids }, { showBackend: this.showBackend })
     return res
   }
 

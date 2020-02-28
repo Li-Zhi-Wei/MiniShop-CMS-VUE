@@ -10,7 +10,7 @@
     <div class="form-container">
       <el-row>
         <el-col :lg="16" :md="20" :sm="24" :xs="24">
-          <Form :data="formData" @submit="handleSubmit"/>
+          <Form :data="formData" :fullscreenLoading="fullscreenLoading" @submit="handleSubmit"/>
         </el-col>
       </el-row>
     </div>
@@ -30,6 +30,7 @@ export default {
   data() {
     return {
       formData: null,
+      fullscreenLoading: false,
     }
   },
   created() {
@@ -39,6 +40,7 @@ export default {
   methods: {
     // 表单组件的提交事件
     async handleSubmit(formData) {
+      this.fullscreenLoading = true
       try {
         // 轮播图基础信息部分的逻辑处理
         await this.updateBannerInfo(formData)
@@ -47,7 +49,12 @@ export default {
         this.$message.success('编辑成功')
         this.handleBack()
       } catch (e) {
-        this.$message.error(e)
+        this.$notify.error({
+          message: e.data.msg,
+          title: '错误',
+          duration: 0,
+        })
+        this.fullscreenLoading = false
       }
     },
 
@@ -56,12 +63,7 @@ export default {
       // 判断轮播图名称和简介与原数据是否存在差异
       if (formData.name !== this.banner.name || formData.description !== this.banner.description) {
         const { id, name, description } = formData
-        try {
-          // 调用模型的编辑轮播图信息方法
-          await banner.editBanner(id, name, description)
-        } catch (e) {
-          throw Object.values(e.data.msg)
-        }
+        await banner.editBanner(id, name, description)
       }
     },
 
@@ -79,52 +81,19 @@ export default {
         addBannerItems = this._processAddBannerItemsArray(bannerItems)
         editBannerItems = this._processEditBannerItemsArray(bannerItems)
         delBannerItems = this._processDelBannerItemsArray(bannerItems)
-        /*
-        // 倒序遍历，解决当调用splice()后导致原数组索引改变的问题
-        for (let i = this.banner.items.length - 1; i >= 0; i--) {
-          for (let j = 0; j < bannerItems.length; j++) {
-            // 找到两个相同id的item，存在则做进一步的判断
-            if (this.banner.items[i].id === bannerItems[j].id) {
-              // 接着判断一下这个要保留的原bannerItem是否被修改过
-              if (this.banner.items[i].key_word !== bannerItems[j].key_word
-                || this.banner.items[i].type !== bannerItems[j].type
-                || this.banner.items[i].img_id !== bannerItems[j].img_id) {
-                // 修改过，放进待更新轮播图元素数组
-                editBannerItems.push(bannerItems[j])
-              }
-              // 存在。从待删除数组中移除
-              delBannerItems.splice(i, 1)
-            }
-          }
-        }
-        for (let j = 0; j < bannerItems.length; j++) {
-          // 如果轮播图元素是空的，代表是一个新增的轮播图元素
-          if (bannerItems[j].id === '') {
-            addBannerItems.push(bannerItems[j])
-          }
-        }
-      } else {
-        // 轮播图元素没有任何变化
-        // 置空待删除轮播图元素的数组，待修改轮播图元素和待新增轮播图元素默认就是空，无需额外处理
-        delBannerItems = []
-         */
       }
-      try {
-        // 判断是否需要发起删除bannerItem
-        if (delBannerItems.length > 0) {
-          const ids = delBannerItems.map(item => item.id)
-          await banner.delBannerItems(ids)
-        }
-        // 判断是否需要发起新增bannerItem
-        if (addBannerItems.length > 0) {
-          await banner.addBannerItems(addBannerItems)
-        }
-        // 判断是否需要发起更新bannerItem
-        if (editBannerItems.length > 0) {
-          await banner.editBannerItems(editBannerItems)
-        }
-      } catch (e) {
-        throw Object.values(e.data.msg).join('；')
+      // 判断是否需要发起删除bannerItem
+      if (delBannerItems.length > 0) {
+        const ids = delBannerItems.map(item => item.id)
+        await banner.delBannerItems(ids)
+      }
+      // 判断是否需要发起新增bannerItem
+      if (addBannerItems.length > 0) {
+        await banner.addBannerItems(addBannerItems)
+      }
+      // 判断是否需要发起更新bannerItem
+      if (editBannerItems.length > 0) {
+        await banner.editBannerItems(editBannerItems)
       }
     },
 

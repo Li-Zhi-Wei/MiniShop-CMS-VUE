@@ -10,7 +10,7 @@
     <div class="form-container">
       <el-row>
         <el-col :lg="16" :md="20" :sm="24" :xs="24">
-          <Form :data="formData" @submit="handleSubmit" @get-detail="getDetail"/>
+          <Form :data="formData" @submit="handleSubmit" @get-detail="getDetail" :fullscreenLoading="fullscreenLoading"/>
         </el-col>
       </el-row>
     </div>
@@ -30,6 +30,7 @@ export default {
   data() {
     return {
       formData: null,
+      fullscreenLoading: false,
     }
   },
   async created() {
@@ -49,6 +50,7 @@ export default {
     },
 
     async handleSubmit(formData) {
+      this.fullscreenLoading = true
       try {
         // 基础信息处理
         await this.updateThemeInfo(formData)
@@ -57,7 +59,12 @@ export default {
         this.$message.success('编辑成功')
         this.handleBack()
       } catch (e) {
-        this.$message.error(e)
+        this.$notify.error({
+          message: e.data.msg,
+          title: '错误',
+          duration: 0,
+        })
+        this.fullscreenLoading = false
       }
     },
 
@@ -72,11 +79,7 @@ export default {
           topic_img_id: formData.topic_img[0].imgId,
           head_img_id: formData.head_img[0].imgId,
         }
-        try {
-          await theme.editTheme(formData.id, data)
-        } catch (e) {
-          throw Object.values(e.data.msg)
-        }
+        await theme.editTheme(formData.id, data)
       }
     },
 
@@ -84,15 +87,11 @@ export default {
       // 通过比较提交的商品和初始商品 2个数组的差别，找到删除或增加的商品的id
       const delItems = this.formData.products.filter(i => !formData.products.find(j => i.id === j.id)).map(item => item.id)
       const addItems = formData.products.filter(i => !this.formData.products.find(j => i.id === j.id)).map(item => item.id)
-      try {
-        if (addItems.length > 0) {
-          await theme.addThemeProducts(formData.id, addItems)
-        }
-        if (delItems.length > 0) {
-          await theme.deleteThemeProducts(formData.id, delItems)
-        }
-      } catch (e) {
-        throw Object.values(e.data.msg).join('；')
+      if (addItems.length > 0) {
+        await theme.addThemeProducts(formData.id, addItems)
+      }
+      if (delItems.length > 0) {
+        await theme.deleteThemeProducts(formData.id, delItems)
       }
     }
 

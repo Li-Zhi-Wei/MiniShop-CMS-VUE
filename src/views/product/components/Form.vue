@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container" v-loading.fullscreen.lock="fullscreenLoading">
     <div class="product-box">
       <el-form ref="form" :rules="rules" :model="temp" status-icon label-width="100px" @submit.native.prevent>
         <el-form-item label="名称" prop="name">
@@ -93,7 +93,7 @@
     </div>
     <div class="submit-box">
       <el-button @click="resetForm">重 置</el-button>
-      <el-button type="primary" @click="handleSubmit">保 存</el-button>
+      <el-button type="primary" @click="showDialogSubmit = true">保 存</el-button>
     </div>
 <!--    添加/编辑sku-->
     <el-dialog :title="title" :visible.sync="showDialogSku">
@@ -154,6 +154,14 @@
         <el-button type="primary" @click="deleteProperty">确 定</el-button>
       </span>
     </el-dialog>
+<!--    提交的提示-->
+    <el-dialog title="提示" :visible.sync="showDialogSubmit" width="30%" center>
+      <span>确定提交？</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="showDialogSubmit = false">取 消</el-button>
+        <el-button type="primary" @click="handleSubmit">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -168,6 +176,7 @@ export default {
   components: { UploadImgs },
   props: {
     data: Object,
+    fullscreenLoading: Boolean,
   },
   data() {
     return {
@@ -213,6 +222,7 @@ export default {
       delItem: {}, // 删除选项时选择的数据
       showDialogDelSku: false,
       showDialogDelProperty: false,
+      showDialogSubmit: false,
       rules: {
         name: [
           { required: true, message: '商品名称不能为空', trigger: 'blur' },
@@ -282,7 +292,7 @@ export default {
      */
     handleAddSku() {
       this.skuTemp = {
-        id: Utils.getRandomStr(),
+        id: null,
         name: null,
         price: null,
         stock: null,
@@ -361,7 +371,7 @@ export default {
      */
     handleAddProperty() {
       this.propertyTemp = {
-        id: Utils.getRandomStr(),
+        id: null,
         name: null,
         detail: null,
       }
@@ -417,6 +427,7 @@ export default {
      * @returns {Promise<void>}
      */
     async handleSubmit() {
+      this.showDialogSubmit = false
       const mainImg = await this.$refs.uploadEleMain.getValue()
       this.temp.image = await this.$refs.uploadEleDetail.getValue()
       if (mainImg.length > 0) {
