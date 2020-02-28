@@ -161,9 +161,11 @@ _axios.interceptors.response.use(
           }
         }
       }
-      Vue.prototype.$message({
+      Vue.prototype.$notify({
         message,
         type: 'error',
+        title: '错误',
+        duration: 0,
       })
       reject()
     })
