@@ -67,7 +67,7 @@
           <el-table-column label="操作" fixed="right" width="170">
             <template slot-scope="scope">
               <el-button plain size="mini" type="primary" @click="handleEditSku(scope.row)">编 辑</el-button>
-              <el-button plain size="mini" type="danger" @click="handleDelSku(scope.row)">删 除</el-button>
+              <el-button plain size="mini" type="danger" @click="handleDelSku(scope)">删 除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -85,7 +85,7 @@
           <el-table-column label="操作" fixed="right" width="170">
             <template slot-scope="scope">
               <el-button plain size="mini" type="primary" @click="handleEditProperty(scope.row)">编 辑</el-button>
-              <el-button plain size="mini" type="danger" @click="handleDelProperty(scope.row)">删 除</el-button>
+              <el-button plain size="mini" type="danger" @click="handleDelProperty(scope)">删 除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -219,7 +219,7 @@ export default {
       showDialogSku: false,
       categoryList: null, // 分类列表
       title: null, // 弹出框标题
-      delItem: {}, // 删除选项时选择的数据
+      delItem: {}, // 删除sku/property时选择的数据
       showDialogDelSku: false,
       showDialogDelProperty: false,
       showDialogSubmit: false,
@@ -324,16 +324,13 @@ export default {
      * 删除sku
      * @param row
      */
-    handleDelSku(row) {
-      this.delItem = row
+    handleDelSku(scope) {
+      this.delItem = scope.row
+      this.delItem.index = scope.$index
       this.showDialogDelSku = true
     },
     deleteSku() {
-      this.temp.sku.forEach((item, index) => {
-        if (item.id === this.delItem.id) {
-          this.temp.sku.splice(index, 1)
-        }
-      })
+      this.temp.sku.splice(this.delItem.index, 1)
       this.showDialogDelSku = false
     },
     /**
@@ -391,16 +388,13 @@ export default {
      * 删除参数
      * @param row
      */
-    handleDelProperty(row) {
-      this.delItem = row
+    handleDelProperty(scope) {
+      this.delItem = scope.row
+      this.delItem.index = scope.$index
       this.showDialogDelProperty = true
     },
     deleteProperty() {
-      this.temp.property.forEach((item, index) => {
-        if (item.id === this.delItem.id) {
-          this.temp.property.splice(index, 1)
-        }
-      })
+      this.temp.property.splice(this.delItem.index, 1)
       this.showDialogDelProperty = false
     },
     /**

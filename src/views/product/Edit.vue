@@ -158,9 +158,6 @@ export default {
       }
       // 剩下的就是编辑的图片
       editImage = curImage
-      console.log('addImage', addImage)
-      console.log('delImage', delImage)
-      console.log('editImage', editImage)
       if (addImage.length > 0) {
         await product.addImage(addImage)
       }
@@ -215,9 +212,6 @@ export default {
         status: item.status,
         stock: item.stock,
       }))
-      console.log('addSku', addSku)
-      console.log('editSku', editSku)
-      console.log('delSku', delSku)
       if (addSku.length > 0) {
         await product.addSku(addSku)
       }
@@ -259,9 +253,6 @@ export default {
         }
         return false
       })
-      console.log('addProperty', addProperty)
-      console.log('delProperty', delProperty)
-      console.log('editProperty', editProperty)
       if (addProperty.length > 0) {
         await product.addProperty(addProperty)
       }

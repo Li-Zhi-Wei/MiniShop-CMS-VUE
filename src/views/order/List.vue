@@ -1,5 +1,5 @@
 <template>
-  <div class="lin-container">
+  <div class="lin-container" v-if="!switchComponent">
     <div class="header">
       <div class="header-left">
         <div class="lin-title">订单列表</div>
@@ -51,7 +51,7 @@
         <el-table-column label="操作" fixed="right" width="170">
           <!-- <el-table-column>标签支持在标签内嵌套一个<template>标签实现复杂的页面元素 -->
           <template slot-scope="scope">
-            <el-button plain size="mini" type="primary" @click="handleEdit(scope.row)">详情</el-button>
+            <el-button plain size="mini" type="primary" @click="handleDetail(scope.row)">详情</el-button>
             <el-button plain size="mini" type="success" @click="handleDel(scope.row.id)" v-auth="'订单发货'" v-if="scope.row.status==2||scope.row.status==4">发货</el-button>
             <el-button plain size="mini" type="danger" @click="handleDel(scope.row.id)" v-auth="'订单发货'" v-if="scope.row.status==1">关闭</el-button>
           </template>
@@ -67,13 +67,16 @@
       </span>
     </el-dialog>
   </div>
+  <component v-else :is="targetComponent" :row="row" @back="handleBack"/>
 </template>
 
 <script>
 import order from '@/models/order'
+import Detail from './Detail'
 
 export default {
   name: 'List',
+  components: { Detail },
   data() {
     return {
       orderList: [],
@@ -84,7 +87,8 @@ export default {
       input: null,
       total_nums: 1,
       currentPage: 1,
-
+      switchComponent: false, // 是否切换组件
+      targetComponent: '', // 切换的目标组件
       pickerOptions: {
         shortcuts: [{
           text: '最近一周',
@@ -155,6 +159,20 @@ export default {
     },
 
     search() {
+      this.getOrder()
+    },
+
+    handleDetail(row) {
+      console.log(row)
+      this.switchComponent = true
+      this.targetComponent = 'Detail'
+    },
+    /**
+     * 处理子组件里点击返回的事件
+     */
+    handleBack() {
+      this.switchComponent = false
+      this.targetComponent = ''
       this.getOrder()
     },
   },
