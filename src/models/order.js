@@ -4,6 +4,8 @@ class Order {
   // 是否自行处理接口异常
   handleError = true
 
+  showBackend = true
+
   async getOrdersPaginate(count, page, params) {
     if (!params.start) {
       params.start = '2019-01-01'
@@ -23,14 +25,13 @@ class Order {
         url += `&order_no=${params.input}`
       }
     }
-    return get(url, { handleError: this.handleError })
+    return get(url, { showBackend: this.showBackend })
   }
 
-  // async delProductByIds(ids) {
-  //   // { ids } 等价于 { ids : ids }，对象的key和value命名相同时的一种简写
-  //   const res = await _delete('v1/product', { ids }, { handleError: this.handleError })
-  //   return res
-  // }
+  async getPayStatus(orderNo) {
+    const res = await get(`v1/order/pay/${orderNo}`, { handleError: this.handleError })
+    return res
+  }
 }
 
 export default new Order()

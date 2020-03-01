@@ -63,11 +63,11 @@
       <span>确定关闭id为{{id}}的订单？</span>
       <span slot="footer" class="dialog-footer">
         <el-button @click="showDialog = false">取 消</el-button>
-        <el-button type="primary" @click="deleteBanner">确 定</el-button>
+        <el-button type="primary" >确 定</el-button>
       </span>
     </el-dialog>
   </div>
-  <component v-else :is="targetComponent" :row="row" @back="handleBack"/>
+  <component v-else :is="targetComponent" :data="data" @back="handleBack"/>
 </template>
 
 <script>
@@ -89,6 +89,7 @@ export default {
       currentPage: 1,
       switchComponent: false, // 是否切换组件
       targetComponent: '', // 切换的目标组件
+      data: null, // 点击详情时选择的数据
       pickerOptions: {
         shortcuts: [{
           text: '最近一周',
@@ -163,6 +164,7 @@ export default {
     },
 
     handleDetail(row) {
+      this.data = row
       console.log(row)
       this.switchComponent = true
       this.targetComponent = 'Detail'

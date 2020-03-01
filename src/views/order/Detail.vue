@@ -19,19 +19,28 @@
         </div>
         <el-form ref="form" label-width="100px" label-position="left" @submit.native.prevent>
           <el-form-item label="订单编号">
-            <span></span>
+            <span>{{data.order_no}}</span>
           </el-form-item>
           <el-form-item label="商品数量">
-            <span></span>
+            <span>{{data.total_count}}</span>
           </el-form-item>
           <el-form-item label="订单金额">
-            <span></span>
+            <span>{{data.total_price}}</span>
+          </el-form-item>
+          <el-form-item label="订单邮费">
+            <span>{{data.postage_price}}</span>
           </el-form-item>
           <el-form-item label="订单状态">
-            <span></span>
+            <span v-if="data.status===1">未付款</span>
+            <span v-if="data.status===2">已付款</span>
+            <span v-if="data.status===3">已发货</span>
+            <span v-if="data.status===4">超&emsp;卖</span>
+            <span v-if="data.status===5">已退款</span>
+            <span v-if="data.status===6">已收货</span>
+            <span v-if="data.status===7">已关闭</span>
           </el-form-item>
           <el-form-item label="下单时间">
-            <span></span>
+            <span>{{data.create_time}}</span>
           </el-form-item>
         </el-form>
       </el-card>
@@ -40,36 +49,49 @@
         <div slot="header">
           <span>商品清单</span>
         </div>
-        <div>product</div>
+        <div class="product" v-for="product in data.snap_items" :key="product.id">
+          <div class="product-image">
+            <img :src="product.img">
+          </div>
+          <div>
+            <div style="margin-bottom: 10px;">名称：{{product.name}}</div>
+            <div style="margin-bottom: 10px;">数量：{{product.counts}}</div>
+            <div>金额：{{product.price}}</div>
+          </div>
+        </div>
       </el-card>
 <!--      -->
       <el-card style="margin-bottom: 50px;">
         <div slot="header">
           <span>支付详情</span>
         </div>
-        <el-form ref="form" label-width="120px" label-position="left" @submit.native.prevent>
-          <el-form-item label="支付状态">
-            <span></span>
+        <el-form v-if="orderStatus" label-width="120px" label-position="left" @submit.native.prevent>
+          <el-form-item label="交易状态">
+            <span>{{orderStatus.trade_state}}</span>
+          </el-form-item>
+          <el-form-item label="交易状态描述">
+            <span>{{orderStatus.trade_state_desc}}</span>
           </el-form-item>
           <el-form-item label="商户订单号">
-            <span></span>
+            <span>{{orderStatus.out_trade_no}}</span>
           </el-form-item>
-          <el-form-item label="微信交易单号">
-            <span></span>
+          <el-form-item v-if="orderStatus.transaction_id" label="微信交易单号">
+            <span>{{orderStatus.transaction_id}}</span>
           </el-form-item>
           <el-form-item label="订单总金额">
-            <span></span>
+            <span>{{orderStatus.total_fee}}</span>
           </el-form-item>
-          <el-form-item label="支付金额">
-            <span></span>
+          <el-form-item v-if="orderStatus.cash_fee" label="支付金额">
+            <span>{{orderStatus.cash_fee}}</span>
           </el-form-item>
-          <el-form-item label="支付时间">
-            <span></span>
+          <el-form-item v-if="orderStatus.time_end" label="支付时间">
+            <span>{{orderStatus.time_end}}</span>
           </el-form-item>
-          <el-form-item label="是否关注公众号">
-            <span></span>
+          <el-form-item v-if="orderStatus.is_subscribe" label="是否关注公众号">
+            <span>{{orderStatus.is_subscribe}}</span>
           </el-form-item>
         </el-form>
+        <div v-else>暂无支付信息</div>
       </el-card>
 <!--      -->
       <el-card style="margin-bottom: 50px;">
@@ -78,13 +100,13 @@
         </div>
         <el-form ref="form" label-width="100px" label-position="left" @submit.native.prevent>
           <el-form-item label="收货人">
-            <span></span>
+            <span>{{data.snap_address.name}}</span>
           </el-form-item>
           <el-form-item label="联系方式">
-            <span></span>
+            <span>{{data.snap_address.mobile}}</span>
           </el-form-item>
           <el-form-item label="收货地址">
-            <span></span>
+            <span>{{data.snap_address.province}}{{data.snap_address.city}}{{data.snap_address.country}}{{data.snap_address.detail}}</span>
           </el-form-item>
         </el-form>
       </el-card>
@@ -100,8 +122,41 @@
 </template>
 
 <script>
+import order from '@/models/order'
+
 export default {
   name: 'Detail',
+  props: {
+    data: Object,
+  },
+  data() {
+    return {
+      orderStatus: null,
+    }
+  },
+  async created() {
+    try {
+      this.orderStatus = await order.getPayStatus(this.data.order_no)
+      const time = this.orderStatus.time_end
+      if (time) {
+        this.orderStatus.time_end = `${time.substr(0, 4)}-${time.substr(4, 2)}-${time.substr(6, 2)} ${time.substr(8, 2)}:${time.substr(10, 2)}:${time.substr(12, 2)}`
+      }
+      if (this.orderStatus.is_subscribe) {
+        if (this.orderStatus.is_subscribe === 'Y') {
+          this.orderStatus.is_subscribe = '是'
+        }
+        if (this.orderStatus.is_subscribe === 'N') {
+          this.orderStatus.is_subscribe = '否'
+        }
+      }
+    } catch (e) {
+      this.$notify.warning({
+        message: e.data.msg,
+        title: '提示',
+      })
+    }
+
+  },
   methods: {
     handleBack() {
       this.$emit('back')
@@ -134,6 +189,22 @@ export default {
 
     .form-container {
       padding: 40px;
+    }
+  }
+
+  .product{
+    display: flex;
+    -webkit-box-align: center;
+    -moz-box-align: center;
+    border-bottom: 1px solid #edf1f7;
+    align-items: center;
+    .product-image{
+      width: 120px;
+      img{
+        display: block;
+        width: 100%;
+        height: auto;
+      }
     }
   }
 </style>
