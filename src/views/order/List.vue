@@ -32,9 +32,9 @@
         <el-table-column label="id" prop="id" width="50"></el-table-column>
         <el-table-column label="订单号" prop="order_no"></el-table-column>
         <el-table-column label="商品概要" prop="snap_name"></el-table-column>
-        <el-table-column label="商品数量" prop="total_count"></el-table-column>
-        <el-table-column label="订单金额" prop="total_price"></el-table-column>
-        <el-table-column label="收货人" prop="snap_address.name"></el-table-column>
+        <el-table-column label="商品数量" prop="total_count" width="90"></el-table-column>
+        <el-table-column label="订单金额" prop="total_price" width="90"></el-table-column>
+        <el-table-column label="收货人" prop="snap_address.name" width="90"></el-table-column>
         <el-table-column label="联系方式" prop="snap_address.mobile"></el-table-column>
         <el-table-column label="订单状态" prop="status">
           <template slot-scope="scope">
@@ -47,13 +47,13 @@
             <el-tag type="info" v-if="scope.row.status===7">已关闭</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="订单创建时间" prop="create_time"></el-table-column>
+        <el-table-column label="下单时间" prop="create_time" width="110"></el-table-column>
         <el-table-column label="操作" fixed="right" width="170">
           <!-- <el-table-column>标签支持在标签内嵌套一个<template>标签实现复杂的页面元素 -->
           <template slot-scope="scope">
             <el-button plain size="mini" type="primary" @click="handleDetail(scope.row)">详情</el-button>
-            <el-button plain size="mini" type="success" @click="handleDel(scope.row.id)" v-auth="'订单发货'" v-if="scope.row.status==2||scope.row.status==4">发货</el-button>
-            <el-button plain size="mini" type="danger" @click="handleDel(scope.row.id)" v-auth="'订单发货'" v-if="scope.row.status==1">关闭</el-button>
+            <el-button plain size="mini" type="success" @click="handleDel(scope.row.id)" v-auth="'订单发货'" v-if="scope.row.status===2||scope.row.status===4">发货</el-button>
+            <el-button plain size="mini" type="danger" @click="handleDel(scope.row.id)" v-auth="'订单发货'" v-if="scope.row.status===1">关闭</el-button>
           </template>
         </el-table-column>
       </el-table>

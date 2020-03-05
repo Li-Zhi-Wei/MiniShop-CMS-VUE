@@ -65,7 +65,9 @@
         <div slot="header">
           <span>支付详情</span>
         </div>
-        <el-form v-if="orderStatus" label-width="120px" label-position="left" @submit.native.prevent>
+        <div v-if="orderStatus === null">获取中...</div>
+        <div v-else-if="orderStatus === 0">暂无支付信息</div>
+        <el-form v-else label-width="120px" label-position="left" @submit.native.prevent>
           <el-form-item label="交易状态">
             <span>{{orderStatus.trade_state}}</span>
           </el-form-item>
@@ -91,7 +93,43 @@
             <span>{{orderStatus.is_subscribe}}</span>
           </el-form-item>
         </el-form>
-        <div v-else>暂无支付信息</div>
+      </el-card>
+<!--      -->
+      <el-card v-if="data.status === 5" style="margin-bottom: 50px;">
+        <div slot="header">
+          <span>退款详情</span>
+        </div>
+        <div v-if="orderRefund === null">获取中...</div>
+        <div v-else-if="orderRefund === 0">查询失败，请刷新重试</div>
+        <el-form v-else label-width="120px" label-position="left" @submit.native.prevent>
+          <el-form-item v-if="orderRefund.result_code" label="退款状态">
+            <span>{{orderRefund.result_code}}</span>
+          </el-form-item>
+          <el-form-item v-if="orderRefund.total_fee" label="订单总金额">
+            <span>{{orderRefund.total_fee}}</span>
+          </el-form-item>
+          <el-form-item v-if="orderRefund.cash_fee" label="用户支付金额">
+            <span>{{orderRefund.cash_fee}}</span>
+          </el-form-item>
+          <el-form-item v-if="orderRefund.refund_fee" label="退款总金额">
+            <span>{{orderRefund.refund_fee}}</span>
+          </el-form-item>
+          <el-form-item v-if="orderRefund.refund_count" label="退款次数">
+            <span>{{orderRefund.refund_count}}</span>
+          </el-form-item>
+          <el-form-item v-if="orderRefund.refund_fee_detail" label="退款详情">
+            <div v-for="(item, index) in orderRefund.refund_fee_detail" :key="index" >
+              <span>金额：{{item.refund_fee}}</span>&emsp;&emsp;&emsp;
+              <span>时间：{{item.refund_success_time}}</span>
+            </div>
+          </el-form-item>
+          <el-form-item v-if="orderRefund.err_code" label="错误码">
+            <span>{{orderRefund.err_code}}</span>
+          </el-form-item>
+          <el-form-item v-if="orderRefund.err_code_des" label="描述">
+            <span>{{orderRefund.err_code_des}}</span>
+          </el-form-item>
+        </el-form>
       </el-card>
 <!--      -->
       <el-card style="margin-bottom: 50px;">
@@ -111,13 +149,41 @@
         </el-form>
       </el-card>
 <!--      -->
-      <el-card>
+      <el-card v-if="data.status!==7">
         <div slot="header">
-          <span>物流信息</span>
+          <span>操作</span>
         </div>
-        <div></div>
+        <div>
+          <el-button plain type="success" @click="showDialogDeliver = true" v-auth="'订单发货'" v-if="data.status===2||data.status===4">发货</el-button>
+          <el-button plain type="danger" @click="handleDel()" v-auth="'关闭订单'" v-if="data.status===1">关闭</el-button>
+          <el-button plain type="danger" @click="handleDel()" v-auth="'关闭订单'" v-if="data.status===1">修改状态为已支付</el-button>
+          <el-button plain type="danger" @click="handleDel()" v-auth="'订单退款'" v-if="data.status===2||data.status===3||data.status===4||data.status===5||data.status===6">退款</el-button>
+        </div>
       </el-card>
+<!--      <el-card>-->
+<!--        <div slot="header">-->
+<!--          <span>物流信息</span>-->
+<!--        </div>-->
+<!--        <div></div>-->
+<!--      </el-card>-->
     </div>
+    <!-- 订单发货 -->
+    <el-dialog title="登记发货信息" :visible.sync="showDialogDeliver">
+      <el-form :model="deliverData" status-icon label-width="80px" @submit.native.prevent>
+        <el-form-item label="快递公司" prop="comp">
+          <el-select v-model="deliverData.comp" clearable placeholder="必选">
+            <el-option v-for="item in compList" :key="item.value" :label="item.label" :value="item.value"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="快递单号" prop="number">
+          <el-input size="medium" v-model="deliverData.number" placeholder="必填"/>
+        </el-form-item>
+      </el-form>
+      <span slot="footer">
+        <el-button @click="showDialogDeliver = false">取 消</el-button>
+        <el-button type="primary" @click="handleSubmitDeliver">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -131,7 +197,31 @@ export default {
   },
   data() {
     return {
-      orderStatus: null,
+      orderStatus: null, // 支付状态
+      orderRefund: null, // 退款状态
+      showDialogDeliver: false,
+      deliverData: {
+        comp: null,
+        number: null
+      }, // 发货信息
+      compList: [
+        { label: '韵达', value: 'yd' },
+        { label: '顺丰', value: 'sf' },
+        { label: '申通', value: 'sto' },
+        { label: '圆通', value: 'yt' },
+        { label: '天天', value: 'tt' },
+        { label: 'EMS', value: 'ems' },
+        { label: '中通', value: 'zto' },
+        { label: '汇通', value: 'ht' },
+        { label: '邮政', value: 'youzheng' },
+        { label: '百世', value: 'bsky' },
+        { label: '京东', value: 'jd' },
+        { label: '德邦', value: 'db' },
+        { label: '宅急送', value: 'zjs' },
+        { label: '国通', value: 'gt' },
+        { label: '全峰', value: 'qf' },
+        { label: '如风达', value: 'rfd' },
+      ],
     }
   },
   async created() {
@@ -150,12 +240,23 @@ export default {
         }
       }
     } catch (e) {
+      this.orderStatus = 0
       this.$notify.warning({
         message: e.data.msg,
         title: '提示',
       })
     }
-
+    if (this.data.status === 5) {
+      try {
+        this.orderRefund = await order.getRefundStatus(this.data.order_no)
+      } catch (e) {
+        this.orderRefund = 0
+        this.$notify.warning({
+          message: e.data.msg,
+          title: '提示',
+        })
+      }
+    }
   },
   methods: {
     handleBack() {

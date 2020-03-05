@@ -32,6 +32,11 @@ class Order {
     const res = await get(`v1/order/pay/${orderNo}`, { handleError: this.handleError })
     return res
   }
+
+  async getRefundStatus(orderNo) {
+    const res = await get(`v1/order/pay/refund/${orderNo}`, { handleError: this.handleError })
+    return res
+  }
 }
 
 export default new Order()
