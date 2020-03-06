@@ -1,4 +1,4 @@
-import { get } from '@/lin/plugins/axios'
+import { get, post, put } from '@/lin/plugins/axios'
 
 class Order {
   // 是否自行处理接口异常
@@ -14,7 +14,7 @@ class Order {
       const date = new Date()
       const Y = date.getFullYear()
       const M = date.getMonth() + 1
-      const D = date.getDate()
+      const D = date.getDate() + 1 // 默认是0点，所以查当天的要加一天
       params.end = Y + (M < 10 ? '-0' : '-') + M + (D < 10 ? '-0' : '-') + D
     }
     let url = `v1/order?count=${count}&page=${page}&start=${params.start}&end=${params.end}`
@@ -35,6 +35,26 @@ class Order {
 
   async getRefundStatus(orderNo) {
     const res = await get(`v1/order/pay/refund/${orderNo}`, { handleError: this.handleError })
+    return res
+  }
+
+  async deliver(id, data) {
+    const res = await post(`v1/order/shipment/${id}`, data, { handleError: this.handleError })
+    return res
+  }
+
+  async refund(data) {
+    const res = await post('v1/order/pay/refund', data, { handleError: this.handleError })
+    return res
+  }
+
+  async close(id) {
+    const res = await put(`v1/order/close/${id}`, {}, { showBackend: this.showBackend })
+    return res
+  }
+
+  async paid(id) {
+    const res = await put(`v1/order/paid/${id}`, {}, { showBackend: this.showBackend })
     return res
   }
 }

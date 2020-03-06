@@ -36,15 +36,6 @@ export default {
   async created() {
     // 深拷贝
     this.formData = JSON.parse(JSON.stringify(this.row))
-    // 数据类型转换，避免后面校验时出现数据类型不一致的错误
-    this.formData.price = parseFloat(this.formData.price) || null
-    this.formData.show_price = parseFloat(this.formData.show_price) || null
-    this.formData.sale = parseInt(this.formData.sale, 10) || null
-    this.formData.sku.forEach(item => {
-      item.price = parseFloat(item.price) || null
-      item.postage = parseFloat(item.postage) || null
-      item.stock = parseInt(item.stock, 10) || null
-    })
   },
   methods: {
     handleBack() {

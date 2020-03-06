@@ -6,7 +6,7 @@
       </div>
       <div class="header-right">
         <div class="search-input">
-          <el-input placeholder="请输入内容" size="medium" v-model="input">
+          <el-input placeholder="按条件搜索" size="medium" v-model="input">
             <el-select class="select" size="medium" slot="prepend" placeholder="请选择" v-model="select">
               <el-option label="订单号" value="order_no"></el-option>
               <el-option label="快递单号" value="number"></el-option>

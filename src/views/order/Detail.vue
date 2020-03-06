@@ -155,9 +155,9 @@
         </div>
         <div>
           <el-button plain type="success" @click="showDialogDeliver = true" v-auth="'订单发货'" v-if="data.status===2||data.status===4">发货</el-button>
-          <el-button plain type="danger" @click="handleDel()" v-auth="'关闭订单'" v-if="data.status===1">关闭</el-button>
-          <el-button plain type="danger" @click="handleDel()" v-auth="'关闭订单'" v-if="data.status===1">修改状态为已支付</el-button>
-          <el-button plain type="danger" @click="handleDel()" v-auth="'订单退款'" v-if="data.status===2||data.status===3||data.status===4||data.status===5||data.status===6">退款</el-button>
+          <el-button plain type="warning" @click="showDialogClose = true" v-auth="'关闭订单'" v-if="data.status===1">关闭</el-button>
+          <el-button plain type="danger" @click="showDialogPaid = true" v-auth="'修改状态为已支付'" v-if="data.status===1">修改状态为已支付</el-button>
+          <el-button plain type="danger" @click="showDialogRefund = true" v-auth="'订单退款'" v-if="data.status===2||data.status===3||data.status===4||data.status===5||data.status===6">退款</el-button>
         </div>
       </el-card>
 <!--      <el-card>-->
@@ -168,20 +168,48 @@
 <!--      </el-card>-->
     </div>
     <!-- 订单发货 -->
-    <el-dialog title="登记发货信息" :visible.sync="showDialogDeliver">
-      <el-form :model="deliverData" status-icon label-width="80px" @submit.native.prevent>
+    <el-dialog title="登记发货信息" :visible.sync="showDialogDeliver" width="30%">
+      <el-form ref="deliverForm" :rules="deliverRules" :model="deliverData" status-icon label-width="90px" @submit.native.prevent>
         <el-form-item label="快递公司" prop="comp">
-          <el-select v-model="deliverData.comp" clearable placeholder="必选">
+          <el-select class="deliver" v-model="deliverData.comp" placeholder="必选">
             <el-option v-for="item in compList" :key="item.value" :label="item.label" :value="item.value"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="快递单号" prop="number">
-          <el-input size="medium" v-model="deliverData.number" placeholder="必填"/>
+          <el-input class="deliver" size="medium" v-model="deliverData.number" placeholder="必填"/>
         </el-form-item>
       </el-form>
       <span slot="footer">
         <el-button @click="showDialogDeliver = false">取 消</el-button>
-        <el-button type="primary" @click="handleSubmitDeliver">确 定</el-button>
+        <el-button type="primary" @click="handleDeliver">确 定</el-button>
+      </span>
+    </el-dialog>
+    <!-- 订单退款 -->
+    <el-dialog title="退款" :visible.sync="showDialogRefund" width="30%">
+      <el-form ref="refundForm" :model="refundData" :rules="refundRules" status-icon label-width="90px" @submit.native.prevent>
+        <el-form-item label="退款金额" prop="refundFee">
+          <el-input class="deliver" size="medium" v-model="refundData.refundFee" placeholder="必填"/>
+        </el-form-item>
+      </el-form>
+      <span slot="footer">
+        <el-button @click="showDialogRefund = false">取 消</el-button>
+        <el-button type="primary" @click="handleRefund">确 定</el-button>
+      </span>
+    </el-dialog>
+    <!-- 关闭订单 -->
+    <el-dialog title="关闭订单" :visible.sync="showDialogClose" width="30%">
+      <span>确定关闭订单？</span>
+      <span slot="footer">
+        <el-button @click="showDialogClose = false">取 消</el-button>
+        <el-button type="primary" @click="handleClose">确 定</el-button>
+      </span>
+    </el-dialog>
+    <!-- 修改状态为已支付 -->
+    <el-dialog title="修改订单状态为已支付" :visible.sync="showDialogPaid" width="30%">
+      <span>危险操作：只有订单在本系统内显示未支付，但微信查询该订单已支付时才需要该操作！<br><br>确定关闭订单？</span>
+      <span slot="footer">
+        <el-button @click="showDialogPaid = false">取 消</el-button>
+        <el-button type="primary" @click="handlePaid">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -200,10 +228,16 @@ export default {
       orderStatus: null, // 支付状态
       orderRefund: null, // 退款状态
       showDialogDeliver: false,
-      deliverData: {
+      showDialogRefund: false,
+      showDialogClose: false,
+      showDialogPaid: false,
+      deliverData: { // 发货信息
         comp: null,
         number: null
-      }, // 发货信息
+      },
+      refundData: { // 退款信息
+        refundFee: null,
+      },
       compList: [
         { label: '韵达', value: 'yd' },
         { label: '顺丰', value: 'sf' },
@@ -222,6 +256,19 @@ export default {
         { label: '全峰', value: 'qf' },
         { label: '如风达', value: 'rfd' },
       ],
+      deliverRules: {
+        comp: [
+          { required: true, message: '快递公司不能为空', trigger: 'blur' },
+        ],
+        number: [
+          { required: true, message: '快递单号不能为空', trigger: 'blur' },
+        ],
+      },
+      refundRules: {
+        refundFee: [
+          { required: true, message: '退款金额不能为空', trigger: 'blur' },
+        ],
+      },
     }
   },
   async created() {
@@ -262,6 +309,101 @@ export default {
     handleBack() {
       this.$emit('back')
     },
+    /**
+     * 订单发货
+     */
+    handleDeliver() {
+      this.$refs.deliverForm.validate(async valid => {
+        if (valid) {
+          this.showDialogDeliver = false
+          try {
+            const res = await order.deliver(this.data.id, this.deliverData)
+            if (res) {
+              this.$message({
+                message: '发货成功',
+                type: 'success',
+              })
+              this.data.status = 3
+            }
+          } catch (e) {
+            this.$notify.error({
+              message: e.data.msg,
+              title: '错误',
+              duration: 0,
+            })
+          }
+        } else {
+          this.$message({
+            message: '请检查数据',
+            type: 'error',
+          })
+        }
+      })
+    },
+    /**
+     * 订单退款
+     */
+    handleRefund() {
+      this.refundData.refundFee = parseFloat(this.refundData.refundFee) || null
+      this.$refs.refundForm.validate(async valid => {
+        if (valid) {
+          this.showDialogRefund = false
+          try {
+            const data = {
+              order_no: this.data.order_no,
+              refund_fee: this.refundData.refundFee
+            }
+            const res = await order.refund(data)
+            if (res) {
+              this.$message({
+                message: '退款成功',
+                type: 'success',
+              })
+              this.data.status = 5
+            }
+          } catch (e) {
+            this.$notify.error({
+              message: e.data.msg,
+              title: '错误',
+              duration: 0,
+            })
+          }
+        } else {
+          this.$message({
+            message: '请检查数据',
+            type: 'error',
+          })
+        }
+      })
+    },
+    /**
+     * 关闭订单
+     */
+    async handleClose() {
+      this.showDialogClose = false
+      const res = await order.close(this.data.id)
+      if (res) {
+        this.$message({
+          message: res.result,
+          type: 'success',
+        })
+        this.data.status = 7
+      }
+    },
+    /**
+     * 修改订单状态为已付款
+     */
+    async handlePaid() {
+      this.showDialogPaid = false
+      const res = await order.paid(this.data.id)
+      if (res) {
+        this.$message({
+          message: res.result,
+          type: 'success',
+        })
+        this.data.status = 2
+      }
+    }
   }
 }
 </script>
@@ -307,5 +449,8 @@ export default {
         height: auto;
       }
     }
+  }
+  .deliver{
+    width: 250px;
   }
 </style>

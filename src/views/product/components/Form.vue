@@ -345,11 +345,13 @@ export default {
           url: img[0].display,
         }
       }
-      this.skuTemp.price = parseFloat(this.skuTemp.price) || null
-      this.skuTemp.postage = parseFloat(this.skuTemp.postage) || null
-      this.skuTemp.stock = parseInt(this.skuTemp.stock, 10) || null
+      this.skuTemp.price = Number.isNaN(Number(this.skuTemp.price)) ? null : this.skuTemp.price
+      this.skuTemp.stock = Number.isNaN(Number(this.skuTemp.stock)) ? null : this.skuTemp.stock
+      this.skuTemp.postage = Number.isNaN(Number(this.skuTemp.postage)) ? null : this.skuTemp.postage
       this.$refs.skuForm.validate(valid => {
         if (valid) {
+          this.skuTemp.stock = Number(this.skuTemp.stock) // 验证成功才能转换成整数，因为null会变为0
+          this.skuTemp.postage = Number(this.skuTemp.postage)
           if (this.title === '编辑套餐') {
             this.temp.sku.forEach((item, index) => {
               if (item.id === this.skuTemp.id) {
@@ -360,6 +362,11 @@ export default {
             this.temp.sku.push(JSON.parse(JSON.stringify(this.skuTemp)))
           }
           this.showDialogSku = false
+        } else {
+          this.$message({
+            message: '请检查数据',
+            type: 'error',
+          })
         }
       })
     },
@@ -413,6 +420,11 @@ export default {
             this.temp.property.push(JSON.parse(JSON.stringify(this.propertyTemp)))
           }
           this.showDialogProperty = false
+        } else {
+          this.$message({
+            message: '请检查数据',
+            type: 'error',
+          })
         }
       })
     },
@@ -428,16 +440,25 @@ export default {
         this.temp.main_img_url = mainImg[0].display
         this.temp.img_id = mainImg[0].imgId
       }
-      this.temp.price = parseFloat(this.temp.price) || null
-      this.temp.show_price = parseFloat(this.temp.show_price) || null
-      this.temp.sale = parseInt(this.temp.sale, 10) || null
+      this.temp.price = Number.isNaN(Number(this.temp.price)) ? null : this.temp.price
+      this.temp.show_price = Number.isNaN(Number(this.temp.show_price)) ? null : this.temp.show_price
+      this.temp.sale = Number.isNaN(Number(this.temp.sale)) ? null : this.temp.sale
+      if (this.temp.category_id === '') {
+        this.temp.category_id = null
+      }
       if (this.temp.sku.length === 0) {
         this.$message.error('最少添加1个套餐')
         return
       }
       this.$refs.form.validate(valid => {
         if (valid) {
+          this.temp.sale = Number(this.temp.sale) // 验证成功才能转换成整数，因为null会变为0
           this.$emit('submit', JSON.parse(JSON.stringify(this.temp)))
+        } else {
+          this.$message({
+            message: '请检查数据',
+            type: 'error',
+          })
         }
       })
     },

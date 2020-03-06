@@ -48,12 +48,10 @@
           </template>
         </el-table-column>
         <el-table-column label="下单时间" prop="create_time" width="110"></el-table-column>
-        <el-table-column label="操作" fixed="right" width="170">
+        <el-table-column label="操作" fixed="right" width="100">
           <!-- <el-table-column>标签支持在标签内嵌套一个<template>标签实现复杂的页面元素 -->
           <template slot-scope="scope">
             <el-button plain size="mini" type="primary" @click="handleDetail(scope.row)">详情</el-button>
-            <el-button plain size="mini" type="success" @click="handleDel(scope.row.id)" v-auth="'订单发货'" v-if="scope.row.status===2||scope.row.status===4">发货</el-button>
-            <el-button plain size="mini" type="danger" @click="handleDel(scope.row.id)" v-auth="'订单发货'" v-if="scope.row.status===1">关闭</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -165,7 +163,6 @@ export default {
 
     handleDetail(row) {
       this.data = row
-      console.log(row)
       this.switchComponent = true
       this.targetComponent = 'Detail'
     },
