@@ -320,7 +320,7 @@ export default {
             const res = await order.deliver(this.data.id, this.deliverData)
             if (res) {
               this.$message({
-                message: '发货成功',
+                message: `${res.msg}，${res.result}`,
                 type: 'success',
               })
               this.data.status = 3
