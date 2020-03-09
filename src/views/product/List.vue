@@ -15,12 +15,12 @@
       <el-table v-loading="loading" :data="productList">
         <!-- label定义列头显示的文本，prop定义要渲染data数组中元素的哪个字段，width定义列宽 -->
         <el-table-column label="id" prop="id" width="50"></el-table-column>
-        <el-table-column label="主图">
+        <el-table-column label="主图" width="130">
           <template slot-scope="scope">
             <img class="img" :src="scope.row.main_img_url">
           </template>
         </el-table-column>
-        <el-table-column label="名称" prop="name"></el-table-column>
+        <el-table-column label="名称" prop="name" width="200"></el-table-column>
         <el-table-column label="分类" prop="category.name"></el-table-column>
         <el-table-column label="价格" prop="price"></el-table-column>
         <el-table-column label="划线价" prop="show_price"></el-table-column>
@@ -213,7 +213,7 @@ export default {
   .img {
     /*margin: 10px;*/
     height: 100px;
-    max-width:150px;
+    max-width:100px;
     width: auto;
   }
   .pagination{

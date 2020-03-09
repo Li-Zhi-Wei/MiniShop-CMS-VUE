@@ -53,10 +53,10 @@
               <img class="img" :src="scope.row.img.url">
             </template>
           </el-table-column>
-          <el-table-column label="名称" prop="name"></el-table-column>
+          <el-table-column label="名称" prop="name" width="150"></el-table-column>
           <el-table-column label="价格" prop="price"></el-table-column>
           <el-table-column label="库存" prop="stock"></el-table-column>
-          <el-table-column label="销量" prop="name"></el-table-column>
+          <el-table-column label="销量" prop="sale"></el-table-column>
           <el-table-column label="状态">
             <template slot-scope="scope">
               <el-tag type="success" v-if="scope.row.status">上架中</el-tag>
