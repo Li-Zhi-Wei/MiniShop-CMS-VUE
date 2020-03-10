@@ -2,10 +2,10 @@
   <div class="container" v-loading.fullscreen.lock="fullscreenLoading">
     <div class="product-box">
       <el-form ref="form" :rules="rules" :model="temp" status-icon label-width="100px" @submit.native.prevent>
-        <el-form-item label="名称" prop="name">
+        <el-form-item label="标题" prop="name">
           <el-input size="medium" v-model="temp.name" placeholder="商品名称"/>
         </el-form-item>
-        <el-form-item label="简介" prop="summary">
+        <el-form-item label="副标题" prop="summary">
           <el-input size="medium" v-model="temp.summary" placeholder="可选，商品简介" type="textarea" :autosize="{minRows:2}"/>
         </el-form-item>
         <el-form-item label="展示价格" prop="price">
