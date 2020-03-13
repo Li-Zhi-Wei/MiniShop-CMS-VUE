@@ -20,7 +20,7 @@
             <img class="img" :src="scope.row.main_img_url">
           </template>
         </el-table-column>
-        <el-table-column label="名称" prop="name" width="200"></el-table-column>
+        <el-table-column label="标题" prop="name" width="200"></el-table-column>
         <el-table-column label="分类" prop="category.name"></el-table-column>
         <el-table-column label="价格" prop="price"></el-table-column>
         <el-table-column label="划线价" prop="show_price"></el-table-column>
@@ -38,7 +38,7 @@
         </el-table-column>
         <el-table-column label="邮费" prop="postage"></el-table-column>
         <el-table-column label="销量" prop="sale"></el-table-column>
-        <el-table-column label="摘要" prop="summary"></el-table-column>
+        <el-table-column label="副标题" prop="summary"></el-table-column>
         <el-table-column label="操作" fixed="right" width="210">
           <!-- <el-table-column>标签支持在标签内嵌套一个<template>标签实现复杂的页面元素 -->
           <template slot-scope="scope">

@@ -1,5 +1,4 @@
 import adminConfig from './admin'
-import bookConfig from './book' // 引入图书管理路由文件
 import operationConfig from './operation'
 import productConfig from './product'
 import orderConfig from './order'
@@ -39,7 +38,6 @@ let homeRouter = [
     inNav: false,
     icon: 'iconfont icon-rizhiguanli',
   },
-  bookConfig,
   adminConfig,
   operationConfig,
   productConfig,

@@ -3,7 +3,7 @@ const operationRouter = {
   name: null,
   title: '运营管理',
   type: 'folder', // 类型: folder, tab, view
-  icon: 'iconfont icon-tushuguanli', // 菜单图标
+  icon: 'iconfont icon-jiemiansheji', // 菜单图标
   filePath: 'views/operation/', // 文件路径
   order: 2,
   inNav: true,
@@ -14,7 +14,7 @@ const operationRouter = {
       route: '/operation/banner/List',
       filePath: 'views/operation/banner/List.vue',
       inNav: true,
-      icon: 'iconfont icon-tushuguanli',
+      icon: '',
     },
     {
       title: '主题列表',
@@ -22,7 +22,7 @@ const operationRouter = {
       route: '/operation/theme/list',
       filePath: 'views/operation/theme/List.vue',
       inNav: true,
-      icon: 'iconfont icon-tushuguanli',
+      icon: '',
     },
   ],
 }

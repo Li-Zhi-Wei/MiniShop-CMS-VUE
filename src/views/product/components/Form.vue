@@ -108,7 +108,7 @@
           <el-input class="sku-input" size="medium" v-model="skuTemp.stock" placeholder="库存数量"/>
         </el-form-item>
         <el-form-item label="运费" prop="postage">
-          <el-input class="sku-input" size="medium" v-model="skuTemp.postage" placeholder="运费"/>
+          <el-input class="sku-input" size="medium" v-model="skuTemp.postage" placeholder="运费"/> <l-icon name="question-circle" color="#aaa" width="30px" height="30px" ></l-icon>
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-switch v-model="skuTemp.status" active-color="#00C292" active-text="上 架" inactive-text="下 架" :active-value="1" :inactive-value="0"></el-switch>

@@ -3,7 +3,7 @@ const productRouter = {
   name: null,
   title: '商品管理',
   type: 'folder', // 类型: folder, tab, view
-  icon: 'iconfont icon-tushuguanli', // 菜单图标
+  icon: 'iconfont icon-shangpinguanli', // 菜单图标
   filePath: 'views/product/', // 文件路径
   order: 3,
   inNav: true,
@@ -14,7 +14,7 @@ const productRouter = {
       route: '/product/list',
       filePath: 'views/product/List.vue',
       inNav: true,
-      icon: 'iconfont icon-tushuguanli',
+      icon: '',
     },
     {
       title: '商品分类',
@@ -22,7 +22,7 @@ const productRouter = {
       route: '/product/category',
       filePath: 'views/product/Category.vue',
       inNav: true,
-      icon: 'iconfont icon-tushuguanli',
+      icon: '',
     },
   ],
 }

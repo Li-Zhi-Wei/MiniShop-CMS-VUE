@@ -3,7 +3,7 @@ const logisticsRouter = {
   name: null,
   title: '物流管理',
   type: 'folder', // 类型: folder, tab, view
-  icon: 'iconfont icon-tushuguanli', // 菜单图标
+  icon: 'iconfont icon-naozhongxiaoxitixing', // 菜单图标
   filePath: 'views/logistics/', // 文件路径
   order: 5,
   inNav: true,
@@ -14,7 +14,7 @@ const logisticsRouter = {
       route: '/logistics/list',
       filePath: 'views/logistics/List.vue',
       inNav: true,
-      icon: 'iconfont icon-tushuguanli',
+      icon: '',
     },
   ],
 }

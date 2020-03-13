@@ -3,7 +3,7 @@ const orderRouter = {
   name: null,
   title: '订单管理',
   type: 'folder', // 类型: folder, tab, view
-  icon: 'iconfont icon-tushuguanli', // 菜单图标
+  icon: 'iconfont icon-kecheng', // 菜单图标
   filePath: 'views/order/', // 文件路径
   order: 4,
   inNav: true,
@@ -14,7 +14,7 @@ const orderRouter = {
       route: '/order/list',
       filePath: 'views/order/List.vue',
       inNav: true,
-      icon: 'iconfont icon-tushuguanli',
+      icon: '',
     },
   ],
 }

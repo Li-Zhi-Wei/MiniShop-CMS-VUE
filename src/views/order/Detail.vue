@@ -360,6 +360,15 @@ export default {
                 type: 'success',
               })
               this.data.status = 5
+              try {
+                this.orderRefund = await order.getRefundStatus(this.data.order_no)
+              } catch (e) {
+                this.orderRefund = 0
+                this.$notify.warning({
+                  message: e.data.msg,
+                  title: '提示',
+                })
+              }
             }
           } catch (e) {
             this.$notify.error({
