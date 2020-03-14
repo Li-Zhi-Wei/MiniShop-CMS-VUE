@@ -13,8 +13,8 @@ class Order {
     if (!params.end) {
       const date = new Date()
       const Y = date.getFullYear()
-      const M = date.getMonth() + 1
-      const D = date.getDate() + 1 // 默认是0点，所以查当天的要加一天
+      const M = date.getMonth() + 1 // 月份从0开始，所以要+1
+      const D = date.getDate() + 1 // 默认是0点，所以查当天的要+1
       params.end = Y + (M < 10 ? '-0' : '-') + M + (D < 10 ? '-0' : '-') + D
     }
     let url = `v1/order?count=${count}&page=${page}&start=${params.start}&end=${params.end}`

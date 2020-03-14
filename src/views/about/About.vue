@@ -92,42 +92,101 @@
     </div>
     <!--统计卡片-->
     <div class="base-statistics">
+      <!--订单统计-->
       <el-card class="order-statistics">
-        <div slot="header">
-          <span>最近7天交易趋势</span>
+        <div slot="header" class="card-header">
+          <span>交易趋势</span>
+          <el-date-picker
+              v-model="orderDate"
+              type="daterange"
+              size="small"
+              style="width: 300px"
+              align="right"
+              unlink-panels
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+              @change="getOrderData"
+              value-format="yyyy-MM-dd"
+              :picker-options="pickerOptions">
+          </el-date-picker>
         </div>
-        <ve-line :data="chartData"></ve-line>
+        <ve-line :loading="orderLoading" :data="orderData"></ve-line>
       </el-card>
+      <!--用户统计-->
       <el-card class="user-statistics">
-        <div slot="header">
-          <span>最近7天新增会员趋势</span>
+        <div slot="header" class="card-header">
+          <span>新增会员趋势</span>
+          <el-date-picker
+              v-model="userDate"
+              type="daterange"
+              size="small"
+              style="width: 300px"
+              align="right"
+              unlink-panels
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+              @change="getUserData"
+              value-format="yyyy-MM-dd"
+              :picker-options="pickerOptions">
+          </el-date-picker>
         </div>
-        <ve-line :data="chartData"></ve-line>
+        <ve-line :loading="userLoading" :data="userData"></ve-line>
       </el-card>
     </div>
-
   </div>
 </template>
 
 <script>
 import VeLine from 'v-charts/lib/line.common'
+import 'v-charts/lib/style.css'
+import about from '@/models/about'
 
 export default {
   data() {
     return {
       activeName: 'first',
       showTeam: false,
-      chartData: {
-        columns: ['日期', '访问用户', '下单用户', '下单率'],
-        rows: [
-          { '日期': '1/1', '访问用户': 1393, '下单用户': 1093, '下单率': 0.32 },
-          { '日期': '1/2', '访问用户': 3530, '下单用户': 3230, '下单率': 0.26 },
-          { '日期': '1/3', '访问用户': 2923, '下单用户': 2623, '下单率': 0.76 },
-          { '日期': '1/4', '访问用户': 1723, '下单用户': 1423, '下单率': 0.49 },
-          { '日期': '1/5', '访问用户': 3792, '下单用户': 3492, '下单率': 0.323 },
-          { '日期': '1/6', '访问用户': 4593, '下单用户': 4293, '下单率': 0.78 }
-        ]
-      }
+      orderDate: [],
+      userDate: [],
+      orderLoading: true,
+      userLoading: true,
+      pickerOptions: {
+        shortcuts: [{
+          text: '最近一周',
+          onClick(picker) {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+            picker.$emit('pick', [start, end])
+          }
+        }, {
+          text: '最近一个月',
+          onClick(picker) {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+            picker.$emit('pick', [start, end])
+          }
+        }, {
+          text: '最近三个月',
+          onClick(picker) {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+            picker.$emit('pick', [start, end])
+          }
+        }]
+      },
+      orderData: {
+        columns: ['日期', '订单数', '金额'],
+        rows: []
+      },
+      userData: {
+        columns: ['日期', '会员数'],
+        rows: []
+      },
     }
   },
   components: { VeLine },
@@ -136,9 +195,42 @@ export default {
       this.showTeam = true
     }
   },
+  created() {
+    this.getData()
+  },
   methods: {
-    handleArticle(link) {
-      window.open(link)
+    async getData() {
+      this.getOrderData()
+      this.getUserData()
+    },
+
+    async getOrderData() {
+      this.orderLoading = true
+      const params = { // 初始化时this.orderDate是[]，判断是真，取值undefined，叉掉日期后this.orderDate为null，判断为假
+        start: this.orderDate ? this.orderDate[0] : null,
+        end: this.orderDate ? this.orderDate[1] : null,
+      }
+      const orderData = await about.getOrderData(params)
+      this.orderData.rows = orderData.map(item => ({
+        '日期': item.date,
+        '订单数': item.count,
+        '金额': item.total_price ? item.total_price : 0
+      }))
+      this.orderLoading = false
+    },
+
+    async getUserData() {
+      this.userLoading = true
+      const params = { // 初始化时this.orderDate是[]，判断是真，取值undefined，叉掉日期后this.orderDate为null，判断为假
+        start: this.userDate ? this.userDate[0] : null,
+        end: this.userDate ? this.userDate[1] : null,
+      }
+      const userData = await about.getUserData(params)
+      this.userData.rows = userData.map(item => ({
+        '日期': item.date,
+        '会员数': item.count,
+      }))
+      this.userLoading = false
     },
   },
 }
@@ -356,6 +448,11 @@ export default {
     display: flex;
     justify-content: space-between;
     margin-top: 20px;
+    .card-header{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
     .order-statistics{
       width: 100%;
       margin-right: 20px;
