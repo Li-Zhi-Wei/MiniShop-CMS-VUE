@@ -1,10 +1,9 @@
 import { get, _delete, post, patch, put } from '@/lin/plugins/axios'
 
 class Banner {
-  // 是否自行处理接口异常
-  handleError = true
+  handleError = true // 是否自行处理接口异常
 
-  showBackend = true
+  showBackend = true // 框架自动弹出异常信息
 
   async getBanners() {
     const res = await get('v1/banner')

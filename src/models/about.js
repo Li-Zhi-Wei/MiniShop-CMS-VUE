@@ -1,15 +1,9 @@
-import { get } from '@/lin/plugins/axios'
+import { get, put } from '@/lin/plugins/axios'
 
 class About {
-
   handleError = true
 
   showBackend = true
-
-  // async addBook(info) {
-  //   const res = await post('v1/book', info, { handleError: true })
-  //   return res
-  // }
 
   async getOrderData(params) {
     const param = this._getDate(params)
@@ -17,7 +11,7 @@ class About {
       start: param.start,
       end: param.end,
       type: param.type,
-      showBackend: true,
+      showBackend: this.showBackend,
     })
     return res
   }
@@ -28,8 +22,33 @@ class About {
       start: param.start,
       end: param.end,
       type: param.type,
-      showBackend: true,
+      showBackend: this.showBackend,
     })
+    return res
+  }
+
+  async getConfig() {
+    const res = await get('v1/config', { showBackend: this.showBackend })
+    return res
+  }
+
+  async setPostage(postage) {
+    const res = await put('v1/config/postage', { postage }, { showBackend: this.showBackend })
+    return res
+  }
+
+  async modifyPostageFlag() {
+    const res = await put('v1/config/postageFlag')
+    return res
+  }
+
+  async modifyShopStatus() {
+    const res = await put('v1/config/shopStatus')
+    return res
+  }
+
+  async modifyShowDialog() {
+    const res = await put('v1/config/showDialog')
     return res
   }
 

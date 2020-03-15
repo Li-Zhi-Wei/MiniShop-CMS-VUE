@@ -3,93 +3,81 @@
     <div class="lin-info">
       <div class="lin-info-left">
         <div class="welcome">
-          <img src="../../assets/img/about/welcome.png" class="welcome-title" alt="" />
-          <div class="subtitle">
-            <div class="guide">您还可以点击林间有风官方网站，查看更多作品</div>
-            <div class="link"><a href="http://www.7yue.pro" target="_blank">http://www.7yue.pro</a></div>
-          </div>
+          <div class="welcome-title">欢迎来到厚德云创商城管理后台</div>
+<!--          <img src="../../assets/img/about/welcome.png" class="welcome-title" alt="" />-->
+<!--          <div class="subtitle">-->
+<!--            <div class="guide">您还可以点击林间有风官方网站，查看更多作品</div>-->
+<!--            <div class="link"><a href="http://www.7yue.pro" target="_blank">http://www.7yue.pro</a></div>-->
+<!--          </div>-->
         </div>
         <img class="welcome-bg" src="../../assets/img/about/header-bg.png" alt="" />
       </div>
       <div class="lin-info-right">
         <div class="team-detail">
           <div class="team-box">
-            <div class="team-title">产品团队</div>
-            <ul class="team-ul">
+            <div class="team-title">店铺设置</div>
+            <ul v-if="config" class="team-ul">
               <li>
-                <span class="shadow-box"> <i class="team-shadow"></i> </span> <span class="team-role">策划</span>
-                <span class="team-name">七月</span>
+                <span class="shadow-box"> <i class="team-shadow"></i> </span> <span class="team-role">店铺开关</span>
+                <el-switch v-model="config.shopStatus" @change="modifyShopStatus" active-color="#00C292" active-text="开" inactive-text="关" :active-value="1" :inactive-value="0"></el-switch>
               </li>
               <li>
-                <span class="shadow-box"> <i class="team-shadow"></i> </span> <span class="team-role">研发</span>
-                <span class="team-name">
-                  <ul v-if="!showTeam">
-                    <li>Pedro</li>
-                    <li>一飞</li>
-                    <li>凉面</li>
-                    <li>圈圈</li>
-                    <li>家乐</li>
-                    <li>Jocky</li>
-                    <li>流乔</li>
-                  </ul>
-                  <ul v-else>
-                    <li>林间有风 CMS 组</li>
-                  </ul>
-                </span>
-              </li>
-              <li>
-                <span class="shadow-box"> <i class="team-shadow"></i> </span> <span class="team-role">设计</span>
-                <span class="team-name">瓜瓜</span>
+                <span class="shadow-box"> <i class="team-shadow"></i> </span> <span class="team-role">全场满xx元包邮开关</span>
+                <el-switch v-model="config.postageFlag" @change="modifyPostageFlag" active-color="#00C292" active-text="开" inactive-text="关" :active-value="1" :inactive-value="0"></el-switch>
+                <el-input class="postage-input" size="mini" v-if="config.postageFlag" v-model="config.postage" placeholder="包邮条件">
+                  <el-button slot="append" @click="setPostage">提交</el-button>
+                </el-input>
               </li>
             </ul>
           </div>
-          <div class="team-icon"><img src="../../assets/img/about/qrcode.jpg" alt="" /></div>
-          <p class="team-label">林间有风公众号</p>
+<!--          <div class="team-icon"><img src="../../assets/img/about/qrcode.jpg" alt="" /></div>-->
+<!--          <p class="team-label">林间有风公众号</p>-->
         </div>
       </div>
     </div>
-    <div class="quantity-statistics">
-      <div class="quantity-item">
-        <div class="quantity-detail">
-          <div class="quantity-detail-box">
-            <div class="quantity-title">总访问量</div>
-            <div class="quantity-border-line"></div>
-            <div class="quantity">11,590</div>
-          </div>
-        </div>
-        <div class="quantity-icon"><img src="../../assets/img/about/icon.png" alt="" /></div>
-      </div>
-      <div class="quantity-item">
-        <div class="quantity-detail">
-          <div class="quantity-detail-box">
-            <div class="quantity-title">总用户数</div>
-            <div class="quantity-border-line"></div>
-            <div class="quantity">51,862</div>
-          </div>
-        </div>
-        <div class="quantity-icon"><img src="../../assets/img/about/icon.png" alt="" /></div>
-      </div>
-      <div class="quantity-item">
-        <div class="quantity-detail">
-          <div class="quantity-detail-box">
-            <div class="quantity-title">新增访问量 (月)</div>
-            <div class="quantity-border-line"></div>
-            <div class="quantity">1,862</div>
-          </div>
-        </div>
-        <div class="quantity-icon"><img src="../../assets/img/about/icon.png" alt="" /></div>
-      </div>
-      <div class="quantity-item">
-        <div class="quantity-detail">
-          <div class="quantity-detail-box">
-            <div class="quantity-title">新增用户数</div>
-            <div class="quantity-border-line"></div>
-            <div class="quantity">1,323</div>
-          </div>
-        </div>
-        <div class="quantity-icon"><img src="../../assets/img/about/icon.png" alt="" /></div>
-      </div>
-    </div>
+<!--    统计数据-->
+<!--    <div class="quantity-statistics">-->
+<!--      <div class="quantity-item">-->
+<!--        <div class="quantity-detail">-->
+<!--          <div class="quantity-detail-box">-->
+<!--            <div class="quantity-title">总访问量</div>-->
+<!--            <div class="quantity-border-line"></div>-->
+<!--            <div class="quantity">11,590</div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <div class="quantity-icon"><img src="../../assets/img/about/icon.png" alt="" /></div>-->
+<!--      </div>-->
+<!--      <div class="quantity-item">-->
+<!--        <div class="quantity-detail">-->
+<!--          <div class="quantity-detail-box">-->
+<!--            <div class="quantity-title">总用户数</div>-->
+<!--            <div class="quantity-border-line"></div>-->
+<!--            <div class="quantity">51,862</div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <div class="quantity-icon"><img src="../../assets/img/about/icon.png" alt="" /></div>-->
+<!--      </div>-->
+<!--      <div class="quantity-item">-->
+<!--        <div class="quantity-detail">-->
+<!--          <div class="quantity-detail-box">-->
+<!--            <div class="quantity-title">新增访问量 (月)</div>-->
+<!--            <div class="quantity-border-line"></div>-->
+<!--            <div class="quantity">1,862</div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <div class="quantity-icon"><img src="../../assets/img/about/icon.png" alt="" /></div>-->
+<!--      </div>-->
+<!--      <div class="quantity-item">-->
+<!--        <div class="quantity-detail">-->
+<!--          <div class="quantity-detail-box">-->
+<!--            <div class="quantity-title">新增用户数</div>-->
+<!--            <div class="quantity-border-line"></div>-->
+<!--            <div class="quantity">1,323</div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <div class="quantity-icon"><img src="../../assets/img/about/icon.png" alt="" /></div>-->
+<!--      </div>-->
+<!--    </div>-->
     <!--统计卡片-->
     <div class="base-statistics">
       <!--订单统计-->
@@ -135,6 +123,20 @@
         <ve-line :loading="userLoading" :data="userData"></ve-line>
       </el-card>
     </div>
+    <!--首页提示-->
+    <el-dialog v-if="config" title="使用提示" :visible.sync="config.showDialog" center>
+      <div class="dialog">
+        <div>1. 邮费计算规则：如果订单中有包邮商品，则整单包邮。若开启了全场满xx元包邮，则达到条件的订单包邮。若以上条件都不满足，则取邮费最高的商品的邮费为订单邮费</div>
+        <div>2. 商品库存为无货时可以看到但不可购买，商品状态为下架时无法看到此商品。商品套餐状态为下架时可以看到此套餐但无法购买。</div>
+        <div>3. 商品分类最多添加16个</div>
+        <div>4. 订单详情里的 ‘支付详情’ 是直接从微信获取的，以此为准。可能因网络阻塞等情况导致用户支付了，但本系统未收到通知，此时通过 ‘支付详情’ 确认用户已支付，可以手动修改订单状态</div>
+        <div>5. 订单退款可自定义退款金额，可多次退款，总退款金额不得大于订单总金额</div>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="modifyShowDialog">我明白了，下次不再显示</el-button>
+        <el-button type="primary" @click="config.showDialog = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -147,7 +149,7 @@ export default {
   data() {
     return {
       activeName: 'first',
-      showTeam: false,
+      config: null,
       orderDate: [],
       userDate: [],
       orderLoading: true,
@@ -158,7 +160,7 @@ export default {
           onClick(picker) {
             const end = new Date()
             const start = new Date()
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 6)
             picker.$emit('pick', [start, end])
           }
         }, {
@@ -166,7 +168,7 @@ export default {
           onClick(picker) {
             const end = new Date()
             const start = new Date()
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 29)
             picker.$emit('pick', [start, end])
           }
         }, {
@@ -174,7 +176,7 @@ export default {
           onClick(picker) {
             const end = new Date()
             const start = new Date()
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 89)
             picker.$emit('pick', [start, end])
           }
         }]
@@ -190,11 +192,6 @@ export default {
     }
   },
   components: { VeLine },
-  mounted() {
-    if (document.body.clientWidth > 1200 && document.body.clientWidth < 1330) {
-      this.showTeam = true
-    }
-  },
   created() {
     this.getData()
   },
@@ -202,6 +199,7 @@ export default {
     async getData() {
       this.getOrderData()
       this.getUserData()
+      this.getConfig()
     },
 
     async getOrderData() {
@@ -232,6 +230,45 @@ export default {
       }))
       this.userLoading = false
     },
+
+    async getConfig() {
+      const res = await about.getConfig()
+      this.config = {
+        postage: res.postage,
+        postageFlag: res.postageFlag,
+        showDialog: Boolean(res.showDialog),
+        shopStatus: res.shopStatus,
+      }
+    },
+
+    async setPostage() {
+      const res = await about.setPostage(this.config.postage)
+      this.$message({
+        message: res.msg,
+        type: 'success',
+      })
+    },
+
+    async modifyPostageFlag() {
+      const res = await about.modifyPostageFlag()
+      this.$message({
+        message: res.msg,
+        type: 'success',
+      })
+    },
+
+    async modifyShopStatus() {
+      const res = await about.modifyShopStatus()
+      this.$message({
+        message: res.msg,
+        type: 'success',
+      })
+    },
+
+    async modifyShowDialog() {
+      await about.modifyShowDialog()
+    },
+
   },
 }
 </script>
@@ -246,6 +283,7 @@ export default {
     width: 100%;
     .lin-info-left {
       position: relative;
+      /*width: 100%;*/
       width: 690px;
       height: 100%;
       background: rgba(69, 119, 255, 1);
@@ -254,8 +292,11 @@ export default {
       .welcome {
         margin: 28px 0 0 30px;
         .welcome-title {
-          width: 366px;
-          height: 31px;
+          width: 640px;
+          height: 40px;
+          font-size: 35px;
+          color: #fff;
+          letter-spacing: 10px;
         }
         .subtitle {
           display: flex;
@@ -307,9 +348,17 @@ export default {
           .team-ul {
             margin-top: 15px;
 
+            .postage-input{
+              width: 140px;
+              margin-left: 20px;
+              /deep/.el-input__inner{
+                background-color: #FFE7DC;
+              }
+            }
+
             li {
-              height: 20px;
-              line-height: 20px;
+              height: 28px;
+              line-height: 28px;
               margin-bottom: 15px;
               font-size: 14px;
 
@@ -337,7 +386,7 @@ export default {
 
               .team-role {
                 display: inline-block;
-                width: 30px;
+                width: 150px;
                 margin-right: 15px;
                 font-weight: 400;
                 color: #45526b;
@@ -389,61 +438,61 @@ export default {
       }
     }
   }
-  .quantity-statistics {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-    height: 90px;
-    .quantity-item {
-      display: flex;
-      width: 23%;
-      height: 100%;
-      background: rgba(255, 255, 255, 1);
-      box-shadow: 0px 2px 14px 0px rgba(243, 243, 243, 1);
-      border-radius: 8px;
-      .quantity-detail {
-        flex: 1;
-        .quantity-detail-box {
-          margin: 12px 0 0 30px;
-          .quantity-title {
-            margin-bottom: 2px;
-            height: 20px;
-            line-height: 20px;
-            color: #495468;
-            font-size: 14px;
-            font-weight: 400;
-          }
-          .quantity-border-line {
-            width: 46px;
-            height: 2px;
-            background: rgba(73, 84, 104, 1);
-          }
-          .quantity {
-            margin-top: 7px;
-            height: 48px;
-            font-size: 32px;
-            color: rgba(73, 84, 104, 1);
-            line-height: 38px;
-            letter-spacing: 2px;
-          }
-        }
-      }
-      .quantity-icon {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 90px;
-        height: 100%;
-        background: rgba(69, 119, 255, 0.1);
-        border-top-right-radius: 8px;
-        border-bottom-right-radius: 8px;
-        img {
-          width: 28px;
-          height: 33px;
-        }
-      }
-    }
-  }
+  /*.quantity-statistics {*/
+  /*  display: flex;*/
+  /*  justify-content: space-between;*/
+  /*  margin-top: 20px;*/
+  /*  height: 90px;*/
+  /*  .quantity-item {*/
+  /*    display: flex;*/
+  /*    width: 23%;*/
+  /*    height: 100%;*/
+  /*    background: rgba(255, 255, 255, 1);*/
+  /*    box-shadow: 0px 2px 14px 0px rgba(243, 243, 243, 1);*/
+  /*    border-radius: 8px;*/
+  /*    .quantity-detail {*/
+  /*      flex: 1;*/
+  /*      .quantity-detail-box {*/
+  /*        margin: 12px 0 0 30px;*/
+  /*        .quantity-title {*/
+  /*          margin-bottom: 2px;*/
+  /*          height: 20px;*/
+  /*          line-height: 20px;*/
+  /*          color: #495468;*/
+  /*          font-size: 14px;*/
+  /*          font-weight: 400;*/
+  /*        }*/
+  /*        .quantity-border-line {*/
+  /*          width: 46px;*/
+  /*          height: 2px;*/
+  /*          background: rgba(73, 84, 104, 1);*/
+  /*        }*/
+  /*        .quantity {*/
+  /*          margin-top: 7px;*/
+  /*          height: 48px;*/
+  /*          font-size: 32px;*/
+  /*          color: rgba(73, 84, 104, 1);*/
+  /*          line-height: 38px;*/
+  /*          letter-spacing: 2px;*/
+  /*        }*/
+  /*      }*/
+  /*    }*/
+  /*    .quantity-icon {*/
+  /*      display: flex;*/
+  /*      justify-content: center;*/
+  /*      align-items: center;*/
+  /*      width: 90px;*/
+  /*      height: 100%;*/
+  /*      background: rgba(69, 119, 255, 0.1);*/
+  /*      border-top-right-radius: 8px;*/
+  /*      border-bottom-right-radius: 8px;*/
+  /*      img {*/
+  /*        width: 28px;*/
+  /*        height: 33px;*/
+  /*      }*/
+  /*    }*/
+  /*  }*/
+  /*}*/
   .base-statistics{
     display: flex;
     justify-content: space-between;
@@ -461,29 +510,33 @@ export default {
       width: 100%;
     }
   }
-}
 
-@media screen and (max-width: 1200px) {
-  .container .lin-info .lin-info-right {
-    display: none;
-  }
-  .container .lin-info .lin-info-left {
-    width: 100%;
-  }
-  .container .quantity-statistics .quantity-item {
-    width: 32%;
-    &:last-child {
-      display: none;
-    }
-  }
-  .container .information .personal {
-    display: none;
+  .dialog{
+    line-height: 28px;
   }
 }
 
-@media screen and (max-width: 1200px) {
-  .container .lin-info .lin-info-left {
-    width: 100%;
-  }
-}
+/*@media screen and (max-width: 1200px) {*/
+/*  .container .lin-info .lin-info-right {*/
+/*    display: none;*/
+/*  }*/
+/*  .container .lin-info .lin-info-left {*/
+/*    width: 100%;*/
+/*  }*/
+/*  .container .quantity-statistics .quantity-item {*/
+/*    width: 32%;*/
+/*    &:last-child {*/
+/*      display: none;*/
+/*    }*/
+/*  }*/
+/*  .container .information .personal {*/
+/*    display: none;*/
+/*  }*/
+/*}*/
+
+/*@media screen and (max-width: 1200px) {*/
+/*  .container .lin-info .lin-info-left {*/
+/*    width: 100%;*/
+/*  }*/
+/*}*/
 </style>
