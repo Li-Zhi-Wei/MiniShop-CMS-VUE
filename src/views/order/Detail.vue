@@ -53,7 +53,7 @@
           <div class="product-image">
             <img :src="product.img">
           </div>
-          <div>
+          <div style="margin-left: 10px;">
             <div style="margin-bottom: 10px;">名称：{{product.name}}</div>
             <div style="margin-bottom: 10px;">数量：{{product.counts}}</div>
             <div>金额：{{product.price}}</div>
@@ -188,7 +188,7 @@
     <el-dialog title="退款" :visible.sync="showDialogRefund" width="30%">
       <el-form ref="refundForm" :model="refundData" :rules="refundRules" status-icon label-width="90px" @submit.native.prevent>
         <el-form-item label="退款金额" prop="refundFee">
-          <el-input class="deliver" size="medium" v-model="refundData.refundFee" placeholder="必填"/>
+          <el-input class="deliver" size="medium" v-model="refundData.refundFee" placeholder="退款金额必须小于订单总金额"/>
         </el-form-item>
       </el-form>
       <span slot="footer">
@@ -360,15 +360,6 @@ export default {
                 type: 'success',
               })
               this.data.status = 5
-              try {
-                this.orderRefund = await order.getRefundStatus(this.data.order_no)
-              } catch (e) {
-                this.orderRefund = 0
-                this.$notify.warning({
-                  message: e.data.msg,
-                  title: '提示',
-                })
-              }
             }
           } catch (e) {
             this.$notify.error({
@@ -452,6 +443,7 @@ export default {
     align-items: center;
     .product-image{
       width: 120px;
+      margin: 10px;
       img{
         display: block;
         width: 100%;

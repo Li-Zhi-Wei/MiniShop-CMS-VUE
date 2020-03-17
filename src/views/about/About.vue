@@ -207,7 +207,7 @@ export default {
       const params = { // 初始化时this.orderDate是[]，判断是真，取值undefined，叉掉日期后this.orderDate为null，判断为假
         start: this.orderDate ? this.orderDate[0] : null,
         end: this.orderDate ? this.orderDate[1] : null,
-      }
+      }/* eslint-disable */
       const orderData = await about.getOrderData(params)
       this.orderData.rows = orderData.map(item => ({
         '日期': item.date,
@@ -266,6 +266,7 @@ export default {
     },
 
     async modifyShowDialog() {
+      this.config.showDialog = false
       await about.modifyShowDialog()
     },
 

@@ -32,7 +32,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="主图" prop="main_img_url">
-          <upload-imgs ref="uploadEleMain" :max-num="1" :value="mainImg" :auto-upload="false"
+          <upload-imgs ref="uploadEleMain" :max-num="1" :value="mainImg" :auto-upload="false" :rules="{ratio: 1}"
                        :remote-fuc="uploadImage"/>
         </el-form-item>
         <el-form-item label="详情图" prop="image">
@@ -108,13 +108,13 @@
           <el-input class="sku-input" size="medium" v-model="skuTemp.stock" placeholder="库存数量"/>
         </el-form-item>
         <el-form-item label="运费" prop="postage">
-          <el-input class="sku-input" size="medium" v-model="skuTemp.postage" placeholder="运费"/> <l-icon name="question-circle" color="#aaa" width="30px" height="30px" ></l-icon>
+          <el-input class="sku-input" size="medium" v-model="skuTemp.postage" placeholder="运费"/>
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-switch v-model="skuTemp.status" active-color="#00C292" active-text="上 架" inactive-text="下 架" :active-value="1" :inactive-value="0"></el-switch>
         </el-form-item>
         <el-form-item label="图片" prop="img">
-          <upload-imgs ref="uploadEleSku" :max-num="1" :value="skuImg" :auto-upload="false"
+          <upload-imgs ref="uploadEleSku" :max-num="1" :value="skuImg" :auto-upload="false" :rules="{ratio: 1}"
                        :remote-fuc="uploadImage"/>
         </el-form-item>
       </el-form>

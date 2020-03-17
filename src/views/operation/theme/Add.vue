@@ -46,7 +46,9 @@ export default {
       }
       try {
         const res = await theme.createTheme(data)
-        await theme.addThemeProducts(res.result.id, data.products)
+        if (data.products.length > 0) {
+          await theme.addThemeProducts(res.result.id, data.products)
+        }
         this.$message.success('添加成功')
         this.handleBack()
       } catch (e) {
