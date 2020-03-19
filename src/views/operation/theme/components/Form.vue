@@ -147,12 +147,14 @@ export default {
      */
     async handleAddProduct() {
       this.showDialog = true
-      const products = await product.getAllProducts()
-      this.allProducts = products.map(item => ({
-        key: item.id,
-        label: item.name,
-        disabled: item.status === 0,
-      }))
+      if (this.allProducts.length === 0) {
+        const products = await product.getAllProducts()
+        this.allProducts = products.map(item => ({
+          key: item.id,
+          label: item.name,
+          // disabled: item.status === 0,
+        }))
+      }
     },
     /**
      * 确定添加关联商品
@@ -174,6 +176,11 @@ export default {
       this.$refs.form.validate(valid => {
         if (valid) {
           this.$emit('submit', this.temp)
+        } else {
+          this.$message({
+            message: '请检查数据',
+            type: 'error',
+          })
         }
       })
     },

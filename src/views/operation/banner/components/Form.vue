@@ -15,16 +15,21 @@
             <div class="banner-item-title-text">轮播图{{ index+1 }}</div>
             <l-icon name="minus-circle" color="#F4516C" @click="handleMinusItem(index)"/>
           </div>
-          <el-form-item label="关键字" :prop="'items.'+index+'.key_word'"
-                        :rules="bannerItemRules.key_word">
-            <el-col :span="5">
-              <el-input size="medium" v-model="temp.items[index].key_word" placeholder="执行关键字"/>
-            </el-col>
-          </el-form-item>
           <el-form-item label="跳转类型" :prop="'items.'+index+'.type'" :rules="bannerItemRules.type">
-            <el-select v-model="temp.items[index].type" placeholder="请选择">
+            <el-select v-model="temp.items[index].type" @change="changeType(temp.items[index])" placeholder="请选择">
               <el-option
-                  v-for="item in options"
+                  v-for="item in typeOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="跳转目标" :prop="'items.'+index+'.key_word'"
+                        :rules="bannerItemRules.key_word">
+            <el-select v-model="temp.items[index].key_word" placeholder="请选择">
+              <el-option
+                  v-for="item in temp.items[index].options"
                   :key="item.value"
                   :label="item.label"
                   :value="item.value">
@@ -66,6 +71,8 @@
 import UploadImgs from '@/components/base/upload-imgs'
 import { customImageUpload } from '@/lin/utils/file'
 import Utils from '@/lin/utils/util'
+import product from '@/models/product'
+import theme from '@/models/theme'
 
 export default {
   name: 'Form',
@@ -85,7 +92,7 @@ export default {
       bannerItemImg: [],
       showDialogSubmit: false,
       uploadImage: customImageUpload,
-      options: [
+      typeOptions: [
         {
           value: 0,
           label: '无导向',
@@ -99,6 +106,8 @@ export default {
           label: '导向专题',
         },
       ],
+      productOptions: [],
+      themeOptions: [],
       rules: {
         name: [
           {
@@ -140,21 +149,39 @@ export default {
       },
     }
   },
-  created() {
+  async created() {
     // 如果有传入props就覆盖temp，没有就保持原来的temp，对应新增和编辑的场景
     this.temp = this.data ? JSON.parse(JSON.stringify(this.data)) : this.temp
+    const products = await product.getAllProducts()
+    const themeList = await theme.getThemes()
+    this.productOptions = products.map(item => ({
+      value: item.id,
+      label: item.name,
+    }))
+    this.themeOptions = themeList.map(item => ({
+      value: item.id,
+      label: item.name,
+    }))
+    this.productOptions.push({
+      value: 0,
+      label: '无导向',
+    })
+    this.themeOptions.push({
+      value: 0,
+      label: '无导向',
+    })
     // 存在轮播图元素，初始化轮播图元素的图片组件
     if (this.temp.items.length > 0) {
-      this.initBannerItemImage()
+      this.initBannerItem()
     } else {
       this.handlePlusItem()
     }
   },
   methods: {
     /**
-     * 初始化图片上传组件
+     * 初始化数据
      */
-    initBannerItemImage() {
+    initBannerItem() {
       this.bannerItemImg = []
       for (let i = 0; i < this.temp.items.length; i++) {
         const item = this.temp.items[i]
@@ -164,6 +191,29 @@ export default {
           display: item.img.url,
         }]
         this.bannerItemImg.push(img)
+        if (this.temp.items[i].type === 1) {
+          this.temp.items[i].options = this.productOptions
+        } else if (this.temp.items[i].type === 2) {
+          this.temp.items[i].options = this.themeOptions
+        } else {
+          this.temp.items[i].options = [{ value: 0, label: '无导向' }]
+        }
+      }
+    },
+
+    /**
+     * 更改跳转类型
+     */
+    changeType(item) {
+      if (item.type === 1) {
+        item.options = this.productOptions
+        item.key_word = null
+      } else if (item.type === 2) {
+        item.options = this.themeOptions
+        item.key_word = null
+      } else {
+        item.options = [{ value: 0, label: '无导向' }]
+        item.key_word = 0
       }
     },
     /**
@@ -179,6 +229,7 @@ export default {
           id: '',
           url: '',
         },
+        options: [],
       }
       this.temp.items.push(item)
       this.bannerItemImg.push([])
@@ -212,7 +263,15 @@ export default {
         this.$refs.form.validate(valid => {
           this.showDialogSubmit = false
           if (valid) {
+            this.temp.items.forEach(item => {
+              delete item.options
+            })
             this.$emit('submit', this.temp)
+          } else {
+            this.$message({
+              message: '请检查数据',
+              type: 'error',
+            })
           }
         })
       })
@@ -229,7 +288,7 @@ export default {
           items: [],
         }
       if (this.temp.items.length > 0) {
-        this.initBannerItemImage()
+        this.initBannerItem()
       }
     },
   },
