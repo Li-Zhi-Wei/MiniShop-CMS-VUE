@@ -66,7 +66,7 @@
           <el-table-column label="运费" prop="postage"></el-table-column>
           <el-table-column label="操作" fixed="right" width="170">
             <template slot-scope="scope">
-              <el-button plain size="mini" type="primary" @click="handleEditSku(scope.row)">编 辑</el-button>
+              <el-button plain size="mini" type="primary" @click="handleEditSku(scope)">编 辑</el-button>
               <el-button plain size="mini" type="danger" @click="handleDelSku(scope)">删 除</el-button>
             </template>
           </el-table-column>
@@ -84,7 +84,7 @@
           <el-table-column label="内容" prop="detail"></el-table-column>
           <el-table-column label="操作" fixed="right" width="170">
             <template slot-scope="scope">
-              <el-button plain size="mini" type="primary" @click="handleEditProperty(scope.row)">编 辑</el-button>
+              <el-button plain size="mini" type="primary" @click="handleEditProperty(scope)">编 辑</el-button>
               <el-button plain size="mini" type="danger" @click="handleDelProperty(scope)">删 除</el-button>
             </template>
           </el-table-column>
@@ -310,12 +310,13 @@ export default {
      * 编辑sku
      * @param row
      */
-    handleEditSku(row) {
-      this.skuTemp = JSON.parse(JSON.stringify(row))
+    handleEditSku(scope) {
+      this.skuTemp = JSON.parse(JSON.stringify(scope.row))
+      this.skuTemp.index = scope.$index
       this.skuImg = [{
         id: Utils.getRandomStr(),
-        imgId: row.img_id,
-        display: row.img.url,
+        imgId: scope.row.img_id,
+        display: scope.row.img.url,
       }]
       this.title = '编辑套餐'
       this.showDialogSku = true
@@ -352,14 +353,12 @@ export default {
         if (valid) {
           this.skuTemp.stock = Number(this.skuTemp.stock) // 验证成功才能转换成整数，因为null会变为0
           this.skuTemp.postage = Number(this.skuTemp.postage)
+          const temp = JSON.parse(JSON.stringify(this.skuTemp))
+          delete temp.index
           if (this.title === '编辑套餐') {
-            this.temp.sku.forEach((item, index) => {
-              if (item.id === this.skuTemp.id) {
-                this.temp.sku.splice(index, 1, JSON.parse(JSON.stringify(this.skuTemp)))
-              }
-            })
+            this.temp.sku.splice(this.skuTemp.index, 1, temp)
           } else {
-            this.temp.sku.push(JSON.parse(JSON.stringify(this.skuTemp)))
+            this.temp.sku.push(temp)
           }
           this.showDialogSku = false
         } else {
@@ -386,8 +385,9 @@ export default {
      * 编辑参数
      * @param row
      */
-    handleEditProperty(row) {
-      this.propertyTemp = JSON.parse(JSON.stringify(row))
+    handleEditProperty(scope) {
+      this.propertyTemp = JSON.parse(JSON.stringify(scope.row))
+      this.propertyTemp.index = scope.$index
       this.title = '编辑参数'
       this.showDialogProperty = true
     },
@@ -410,14 +410,12 @@ export default {
     handleSubmitProperty() {
       this.$refs.propertyForm.validate(valid => {
         if (valid) {
+          const temp = JSON.parse(JSON.stringify(this.propertyTemp))
+          delete temp.index
           if (this.title === '编辑参数') {
-            this.temp.property.forEach((item, index) => {
-              if (item.id === this.propertyTemp.id) {
-                this.temp.property.splice(index, 1, JSON.parse(JSON.stringify(this.propertyTemp)))
-              }
-            })
+            this.temp.property.splice(this.propertyTemp.index, 1, temp)
           } else {
-            this.temp.property.push(JSON.parse(JSON.stringify(this.propertyTemp)))
+            this.temp.property.push(temp)
           }
           this.showDialogProperty = false
         } else {
