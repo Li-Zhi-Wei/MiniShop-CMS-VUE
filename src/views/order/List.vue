@@ -29,14 +29,14 @@
     <div class="table-container">
       <el-table v-loading="loading" :data="orderList">
         <!-- label定义列头显示的文本，prop定义要渲染data数组中元素的哪个字段，width定义列宽 -->
-        <el-table-column label="id" prop="id" width="50"></el-table-column>
-        <el-table-column label="订单号" prop="order_no"></el-table-column>
+        <el-table-column label="id" prop="id" width="80"></el-table-column>
+        <el-table-column label="订单号" prop="order_no" width="160"></el-table-column>
         <el-table-column label="商品概要" prop="snap_name"></el-table-column>
         <el-table-column label="商品数量" prop="total_count" width="90"></el-table-column>
         <el-table-column label="订单金额" prop="total_price" width="90"></el-table-column>
         <el-table-column label="收货人" prop="snap_address.name" width="90"></el-table-column>
-        <el-table-column label="联系方式" prop="snap_address.mobile"></el-table-column>
-        <el-table-column label="订单状态" prop="status">
+        <el-table-column label="联系方式" prop="snap_address.mobile" width="120"></el-table-column>
+        <el-table-column label="订单状态" prop="status" width="90">
           <template slot-scope="scope">
             <el-tag type="danger" effect="dark" v-if="scope.row.status===1">未付款</el-tag>
             <el-tag type="warning" effect="dark" v-if="scope.row.status===2">已付款</el-tag>

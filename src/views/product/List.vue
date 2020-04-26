@@ -14,13 +14,13 @@
     <div class="table-container">
       <el-table v-loading="loading" :data="productList">
         <!-- label定义列头显示的文本，prop定义要渲染data数组中元素的哪个字段，width定义列宽 -->
-        <el-table-column label="id" prop="id" width="50"></el-table-column>
+        <el-table-column label="id" prop="id" width="80"></el-table-column>
         <el-table-column label="主图" width="130">
           <template slot-scope="scope">
             <img class="img" :src="scope.row.main_img_url">
           </template>
         </el-table-column>
-        <el-table-column label="标题" prop="name" width="200"></el-table-column>
+        <el-table-column label="标题" prop="name" width="300"></el-table-column>
         <el-table-column label="分类" prop="category.name"></el-table-column>
         <el-table-column label="价格" prop="price"></el-table-column>
         <el-table-column label="划线价" prop="show_price"></el-table-column>
@@ -36,9 +36,9 @@
             <el-tag type="info" v-if="!scope.row.status">已下架</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="邮费" prop="postage"></el-table-column>
+<!--        <el-table-column label="邮费" prop="postage"></el-table-column>-->
         <el-table-column label="销量" prop="sale"></el-table-column>
-        <el-table-column label="副标题" prop="summary"></el-table-column>
+<!--        <el-table-column label="副标题" prop="summary"></el-table-column>-->
         <el-table-column label="操作" fixed="right" width="210">
           <!-- <el-table-column>标签支持在标签内嵌套一个<template>标签实现复杂的页面元素 -->
           <template slot-scope="scope">
