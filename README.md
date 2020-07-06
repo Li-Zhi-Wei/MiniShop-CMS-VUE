@@ -13,8 +13,9 @@
 
 配套项目请访问
 
-* [商城CMS后端项目](https://github.com/Li-Zhi-Wei/MiniShop-CMS-backend)
-* [商城小程序后端](https://github.com/Li-Zhi-Wei/MiniShop-backend)
+* [商城CMS后端](https://github.com/Li-Zhi-Wei/MiniShop-CMS-backend)
+* [微信小程序商城](https://github.com/Li-Zhi-Wei/MiniShop-WeApp)
+* [商城后端](https://github.com/Li-Zhi-Wei/MiniShop-backend)
 
 ## 线上 Demo
 
