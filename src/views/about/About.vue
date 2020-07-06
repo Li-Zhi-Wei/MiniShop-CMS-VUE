@@ -3,7 +3,7 @@
     <div class="lin-info">
       <div class="lin-info-left">
         <div class="welcome">
-          <div class="welcome-title">欢迎来到厚德云创商城管理后台</div>
+          <div class="welcome-title">欢迎来到微商城管理后台</div>
 <!--          <img src="../../assets/img/about/welcome.png" class="welcome-title" alt="" />-->
 <!--          <div class="subtitle">-->
 <!--            <div class="guide">您还可以点击林间有风官方网站，查看更多作品</div>-->
