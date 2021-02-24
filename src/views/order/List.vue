@@ -5,6 +5,11 @@
         <div class="lin-title">订单列表</div>
       </div>
       <div class="header-right">
+        <div>
+          <el-select v-model="status"  @change="search" clearable size="medium" placeholder="选择订单状态">
+            <el-option v-for="item in statusList" :key="item.value" :label="item.label" :value="item.value"></el-option>
+          </el-select>
+        </div>
         <div class="search-input">
           <el-input placeholder="订单号/收货人姓名" size="medium" v-model="input">
             <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
@@ -83,6 +88,7 @@ export default {
       loading: true, // 显示加载状态
       date: [],
       input: null,
+      status: null,
       total_nums: 1,
       currentPage: 1,
       switchComponent: false, // 是否切换组件
@@ -115,6 +121,36 @@ export default {
           }
         }]
       },
+      statusList: [
+        {
+          label: '未付款',
+          value: 1,
+        },
+        {
+          label: '已付款',
+          value: 2,
+        },
+        {
+          label: '已发货',
+          value: 3,
+        },
+        {
+          label: '超卖',
+          value: 4,
+        },
+        {
+          label: '已退款',
+          value: 5,
+        },
+        {
+          label: '已收货',
+          value: 6,
+        },
+        {
+          label: '已关闭',
+          value: 7,
+        },
+      ],
     }
   },
   // 生命周期钩子，在该组件被创建后触发
@@ -129,6 +165,7 @@ export default {
         start: this.date ? this.date[0] : null,
         end: this.date ? this.date[1] : null,
         input: this.input,
+        status: this.status,
       }
       try {
         const res = await order.getOrdersPaginate(10, this.currentPage - 1, params)
@@ -193,6 +230,9 @@ export default {
       display: flex;
       align-items: center;
 
+      .search-input{
+        padding-left: 20px;
+      }
       .date-picker{
         padding-left: 20px;
       }

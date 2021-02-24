@@ -25,6 +25,9 @@ class Order {
         url += `&order_no=${params.input}`
       }
     }
+    if (params.status) {
+      url += `&status=${params.status}`
+    }
     return get(url, { showBackend: this.showBackend })
   }
 

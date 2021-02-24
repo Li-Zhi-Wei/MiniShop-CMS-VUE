@@ -20,17 +20,17 @@
             <img class="img" :src="scope.row.main_img_url">
           </template>
         </el-table-column>
-        <el-table-column label="标题" prop="name" width="300"></el-table-column>
+        <el-table-column label="标题" prop="name" width="230"></el-table-column>
         <el-table-column label="分类" prop="category.name"></el-table-column>
         <el-table-column label="价格" prop="price"></el-table-column>
         <el-table-column label="划线价" prop="show_price"></el-table-column>
-        <el-table-column label="库存">
+        <el-table-column label="库存" width="90">
           <template slot-scope="scope">
             <el-tag type="success" v-if="scope.row.stock">有&emsp;货</el-tag>
             <el-tag type="info" v-if="!scope.row.stock">无&emsp;货</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="状态">
+        <el-table-column label="状态" width="90">
           <template slot-scope="scope">
             <el-tag type="success" v-if="scope.row.status">上架中</el-tag>
             <el-tag type="info" v-if="!scope.row.status">已下架</el-tag>
@@ -39,13 +39,14 @@
 <!--        <el-table-column label="邮费" prop="postage"></el-table-column>-->
         <el-table-column label="销量" prop="sale"></el-table-column>
 <!--        <el-table-column label="副标题" prop="summary"></el-table-column>-->
-        <el-table-column label="操作" fixed="right" width="210">
+        <el-table-column label="操作" fixed="right" width="300">
           <!-- <el-table-column>标签支持在标签内嵌套一个<template>标签实现复杂的页面元素 -->
           <template slot-scope="scope">
             <el-button plain size="mini" type="warning" @click="handleModifyStatus(scope.row.id)" v-if="scope.row.status" v-auth="'商品上架/下架'">下 架</el-button>
             <el-button plain size="mini" type="success" @click="handleModifyStatus(scope.row.id)" v-if="!scope.row.status" v-auth="'商品上架/下架'">上 架</el-button>
             <el-button plain size="mini" type="primary" @click="handleEdit(scope.row)" v-auth="'编辑商品'">编 辑</el-button>
             <el-button plain size="mini" type="danger" @click="handleDel(scope.row.id)" v-auth="'删除商品'">删 除</el-button>
+            <el-button plain size="mini" type="primary" @click="handleEditStock(scope.row)" v-auth="'编辑库存'">编辑库存</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -56,6 +57,35 @@
       <span slot="footer" class="dialog-footer">
         <el-button @click="showDialog = false">取 消</el-button>
         <el-button type="primary" @click="deleteProduct">确 定</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog title="编辑库存" :visible.sync="showEditStock" center>
+
+      <div class="sku-table">
+        <el-table :data="row.sku">
+          <el-table-column label="图片" width="130">
+            <template slot-scope="scope">
+              <img class="img" :src="scope.row.img.url">
+            </template>
+          </el-table-column>
+          <el-table-column label="名称" prop="name"></el-table-column>
+          <el-table-column label="状态" width="90">
+            <template slot-scope="scope">
+              <el-tag type="success" v-if="scope.row.status">上架中</el-tag>
+              <el-tag type="info" v-if="!scope.row.status">已下架</el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column label="库存" prop="stock" width="150">
+            <template slot-scope="scope">
+              <el-input size="mini" v-model="scope.row.stock" placeholder="库存"></el-input>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="showEditStock = false">取 消</el-button>
+        <el-button type="primary" @click="submitStock">提 交</el-button>
       </span>
     </el-dialog>
   </div>
@@ -73,7 +103,8 @@ export default {
   data() {
     return {
       productList: [],
-      showDialog: false,
+      showDialog: false, // 显示删除商品对话框
+      showEditStock: false, // 显示编辑库存对话框
       id: null, // product id
       loading: true, // 显示加载状态
       total_nums: null,
@@ -81,7 +112,7 @@ export default {
       input: null,
       switchComponent: false, // 是否切换组件
       targetComponent: '', // 切换的目标组件
-      row: null, // 点击的行数据
+      row: {}, // 点击的行数据
     }
   },
   created() {
@@ -177,6 +208,31 @@ export default {
       this.switchComponent = false
       this.targetComponent = ''
       this.getProducts()
+    },
+
+    handleEditStock(row) {
+      this.row = row
+      this.showEditStock = true
+    },
+
+    async submitStock() {
+      const sku = []
+      let isNum = true
+      this.row.sku.forEach(item => {
+        if (Number.isNaN(Number(item.stock))) {
+          isNum = false
+          return
+        }
+        item.stock = parseInt(item.stock, 10)
+        sku.push({ id: item.id, stock: item.stock })
+      })
+      if (!isNum) {
+        this.$message.error('库存数量格式不正确')
+        return
+      }
+      await product.editSku(sku)
+      this.showEditStock = false
+      this.$message.success('编辑库存成功')
     },
   },
 }
