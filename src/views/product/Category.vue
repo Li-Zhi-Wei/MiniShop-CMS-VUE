@@ -150,7 +150,9 @@ export default {
       }
       this.title = '新增分类'
       this.showDialogEdit = true
-      this.$refs.form.clearValidate()
+      if (this.$refs.form) {
+        this.$refs.form.clearValidate()
+      }
     },
 
     handleEdit(row) {
@@ -168,7 +170,9 @@ export default {
         }]
       }
       this.showDialogEdit = true
-      this.$refs.form.clearValidate()
+      if (this.$refs.form) {
+        this.$refs.form.clearValidate()
+      }
     },
 
     async handleSubmit() {
@@ -177,7 +181,7 @@ export default {
         if (valid && (this.temp.level === 2 ? this.temp.pid : true)) {
           if (this.temp.id && this.temp.level === 2) {
             const tempCategory = this.categoryList.find(item => item.id === this.temp.id)
-            if (tempCategory.level === 1) {
+            if (tempCategory) {
               if (tempCategory.children.length !== 0) {
                 this.$message({
                   message: '请先将清空此分类下的二级分类',

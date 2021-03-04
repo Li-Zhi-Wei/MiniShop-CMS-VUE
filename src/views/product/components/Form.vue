@@ -217,7 +217,7 @@ export default {
       uploadImage: customImageUpload,
       showDialogProperty: false,
       showDialogSku: false,
-      categoryList: null, // 分类列表
+      categoryList: [], // 分类列表
       title: null, // 弹出框标题
       delItem: {}, // 删除sku/property时选择的数据
       showDialogDelSku: false,
@@ -272,7 +272,10 @@ export default {
   },
   async created() {
     this.temp = this.data ? JSON.parse(JSON.stringify(this.data)) : this.temp
-    this.categoryList = await category.getCategorys()
+    const categoryTemp = await category.getCategorys()
+    categoryTemp.forEach(item => {
+      this.categoryList = this.categoryList.concat(item.children)
+    })
     if (this.data) {
       this.mainImg = [{
         id: Utils.getRandomStr(),
